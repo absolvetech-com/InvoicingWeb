@@ -167,5 +167,64 @@ namespace InvoicesAppAPI.Repositories
             }
             return 0;
         }
+
+        public async Task<long> AddCustomer(Customers model)
+        {
+            if (db != null)
+            {
+                bool checkNameExists = db.Customers.Any(x => x.PersonalEmail.ToLower() == model.PersonalEmail.ToLower());
+                if (!checkNameExists)
+                {
+                    await db.Customers.AddAsync(model);
+                    await db.SaveChangesAsync();
+                    return model.CustomerId;
+                }
+                else
+                    return -1;
+            }
+            return 0;
+        }
+
+        public async Task<long> UpdateCustomer(CustomerViewModel model)
+        {
+            if (db != null)
+            {
+                bool checkNameExists = db.Customers.Any(x => x.PersonalEmail.ToLower() == model.PersonalEmail.ToLower() && x.CustomerId!=model.CustomerId);
+                if (!checkNameExists)
+                {
+                    Customers objCustomer = new Customers();
+                    objCustomer = db.Customers.Where(x => x.CustomerId == model.CustomerId).FirstOrDefault();
+                    objCustomer.FirstName = model.FirstName;
+                    objCustomer.LastName = model.LastName;
+                    objCustomer.Phone = model.Phone;
+                    objCustomer.Fax = model.Fax;
+                    objCustomer.Mobile = model.Mobile;
+                    objCustomer.Address1 = model.Address1;
+                    objCustomer.Address2 = model.Address2;
+                    objCustomer.BillingAddress = model.BillingAddress;
+                    objCustomer.MailingAddress = model.MailingAddress;
+                    objCustomer.CountryId = model.CountryId;
+                    objCustomer.StateId = model.StateId;
+                    objCustomer.City = model.City;
+                    objCustomer.Postalcode = model.Postalcode;
+                    objCustomer.PersonalEmail = model.PersonalEmail;
+                    objCustomer.BussinessEmail = model.BussinessEmail;
+                    objCustomer.Gender = model.Gender;
+                    objCustomer.Dob = (!string.IsNullOrWhiteSpace(model.Dob)) ? DateTime.ParseExact(model.Dob, "dd/MM/yyyy", null) : (DateTime?)null;
+                    objCustomer.Gstin = model.Gstin;
+                    objCustomer.AccountNumber = Convert.ToInt64(model.AccountNumber);
+                    objCustomer.PosoNumber = model.PosoNumber;
+                    objCustomer.Website = model.Website;
+                    objCustomer.UpdatedBy = model.UserId;
+                    objCustomer.UpdatedDate = DateTime.Now;
+                    db.Customers.Update(objCustomer);
+                    await db.SaveChangesAsync();
+                    return 1;
+                }
+                else
+                    return -1;
+            }
+            return 0;
+        }
     }
 }
