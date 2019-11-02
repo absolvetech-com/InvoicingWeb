@@ -13,7 +13,7 @@ namespace InvoicesAppAPI.Models
         public long StateId { get; set; }
         public string Name { get; set; }
         //Foreign key 
-        public long? CountryId { get; set; }
+        public long CountryId { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string CreatedBy { get; set; }
         public bool? IsDeleted { get; set; }

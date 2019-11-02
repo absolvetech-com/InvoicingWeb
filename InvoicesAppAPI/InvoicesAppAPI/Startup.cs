@@ -54,6 +54,7 @@ namespace InvoicesAppAPI
 
             services.AddScoped<IBussinessService, BussinessRepository>();
             services.AddScoped<IUserService, UserRepository>();
+            services.AddScoped<IManagementService, ManagementRepository>();
             services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequireDigit = false;

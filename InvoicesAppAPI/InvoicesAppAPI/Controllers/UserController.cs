@@ -78,11 +78,11 @@ namespace InvoicesAppAPI.Controllers
                     _userDetails.BussinessDetails = bussiness;
                     return new JsonResult(new { status = StatusCodes.Status200OK, success = true, message = "show user profile successfully.", userstatus, user_info = _userDetails });
                 }
-                return new JsonResult(new { status = StatusCodes.Status400BadRequest, success = false, message = "username or password is incorrect.", userstatus = false });
+                return new JsonResult(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found any user.", userstatus = false });
             }
             catch (Exception ex)
             {
-                return new JsonResult(new { status = StatusCodes.Status400BadRequest, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return new JsonResult(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
             }
         }
 
@@ -136,14 +136,14 @@ namespace InvoicesAppAPI.Controllers
                             return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus = false });
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "sorry, we couldn't find an account with that email or user is blocked.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't find an account with that email or user is blocked.", userstatus = false });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
             }
         }
         #endregion
@@ -175,20 +175,20 @@ namespace InvoicesAppAPI.Controllers
                             return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "some error occurs", userstatus = false }); 
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "sorry, block or inactive user can't update bussiness detials.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, block or inactive user can't update bussiness detials.", userstatus = false });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
             }
         }
         #endregion
 
 
-        #region " GetLinkedUserById "
+        #region " GetLinkedUserById / Sub User By ParentId"
         [HttpGet]
         [Authorize(Roles = "admin")]
         [Route("LinkedUsers")]
@@ -203,7 +203,7 @@ namespace InvoicesAppAPI.Controllers
                     var linkedusers = await _userService.GetLinkedUsers(Id);
                     if (linkedusers == null)
                     {
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "could not find any linked user.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any linked user.", userstatus = false });
                     } 
                     return Ok(new { status = StatusCodes.Status200OK, success = true, message = "linked users getting successfully.", userstatus = true, linkedusers });
                 }
@@ -211,10 +211,49 @@ namespace InvoicesAppAPI.Controllers
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
             }
         }
 
+        #endregion
+
+
+        #region " Delete Linked User"
+        [HttpPost]
+        [Authorize(Roles = "subadmin, admin")]
+        [Route("DeleteLinkedUser")]
+        public async Task<IActionResult> DeleteLinkedUser(string linkedUserId)
+        {
+            try
+            {
+                //to get userid from access token
+                string Id = User.Claims.First(c => c.Type == "UserID").Value;
+                if (!string.IsNullOrEmpty(linkedUserId))
+                {
+                    var linkeduser = await _userManager.FindByIdAsync(linkedUserId);
+                    if(linkeduser == null)
+                    {
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any linked user.", userstatus = false });
+                    }
+                    linkeduser.UserStatus = false;
+                    linkeduser.IsDeleted = true;
+                    linkeduser.DeletedDate = DateTime.Now;
+                    linkeduser.DeletedBy = Id;
+                    IdentityResult res = await _userManager.UpdateAsync(linkeduser);
+                    if (res.Succeeded)
+                    {
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user deleted successfully.", userstatus = true });
+                    }
+                    else
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus = false });
+                }
+                return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct", userstatus = false });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+            }
+        }
         #endregion
     }
 }

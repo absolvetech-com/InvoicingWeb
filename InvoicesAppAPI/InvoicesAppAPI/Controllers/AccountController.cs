@@ -119,12 +119,12 @@ namespace InvoicesAppAPI.Controllers
                 }
                 catch (Exception ex)
                 { 
-                    return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ex.Message.ToString() });
+                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ex.Message.ToString() });
                 }
             }
             else
             {  
-                return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "requested user type is not authorised" });
+                return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "requested user type is not authorised" });
             } 
         }
 
@@ -140,10 +140,14 @@ namespace InvoicesAppAPI.Controllers
             { 
                 if (!ModelState.IsValid)
                 { 
-                    return Ok(new { status = StatusCodes.Status400BadRequest, success= false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success= false, message = "parameters are not correct.", userstatus = false });
                 }
 
                 var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found any user associated with this email.", userstatus = false });
+                }
                 var userstatus = user.UserStatus;
                 if (user != null && userstatus && await _userManager.CheckPasswordAsync(user, model.Password))
                 {
@@ -206,7 +210,7 @@ namespace InvoicesAppAPI.Controllers
             }
             catch(Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "something went wrong."+ ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong."+ ex.Message, userstatus = false });
             }
         }
 
@@ -235,13 +239,13 @@ namespace InvoicesAppAPI.Controllers
                     }
                 }
                 else
-                {
-                    return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "email not exists.", userstatus=false });
+                { 
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found any user associated with this email.", userstatus = false });
                 }
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
             }
         }
 
@@ -280,15 +284,15 @@ namespace InvoicesAppAPI.Controllers
                         else
                             return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus=false });
                     }
-                    else
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "sorry, we couldn't find an account with that email.", userstatus= false });
+                    else 
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't found any user associated with this email.", userstatus = false });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
             }
         }
 
@@ -329,14 +333,14 @@ namespace InvoicesAppAPI.Controllers
                         } 
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "sorry, we couldn't find an account with that email.", userstatus });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't any user associated with this email.", userstatus });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
             }
         }
 
@@ -370,14 +374,14 @@ namespace InvoicesAppAPI.Controllers
                         }
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "sorry, we couldn't find an account with that email.", userstatus });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't any user associated with this email.", userstatus });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
             }
         }
 

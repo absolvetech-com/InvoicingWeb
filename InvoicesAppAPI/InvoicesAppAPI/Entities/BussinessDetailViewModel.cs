@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@ namespace InvoicesAppAPI.Entities
         public int Id { get; set; }
         public string IdentityId { get; set; }
         public string UniqueBussinessId { get; set; }
+        [Required]
         public string BussinessName { get; set; }
         public string BussinessLogo { get; set; }
         public string BussinessCoverPhoto { get; set; }
@@ -23,7 +25,9 @@ namespace InvoicesAppAPI.Entities
         public string Founded { get; set; }
         public string Fax { get; set; }
         public string WebAddress { get; set; }
+        [Required]
         public string BussinessEmail { get; set; }
+        [Required]
         public string BussinessPhone { get; set; }
         public string Address1 { get; set; }
         public string Address2 { get; set; }
