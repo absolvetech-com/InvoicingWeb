@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using InvoicesAppAPI.Entities;
+using InvoicesAppAPI.Helpers;
 using InvoicesAppAPI.Models;
 using InvoicesAppAPI.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -302,6 +303,116 @@ namespace InvoicesAppAPI.Controllers
                     else if (retId < 0)
                     {
                         return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "state name already exists." });
+                    }
+                    else
+                    {
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "db connection error." });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                }
+            }
+            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct." });
+        }
+        #endregion
+
+
+        #region " Create Customer"
+        [HttpPost]
+        [Authorize(Roles = "admin, subadmin")]
+        [Route("CreateCustomer")]
+        public async Task<IActionResult> CreateCustomer(CustomerViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    //get user id from access token i.e authorized user
+                    string Id = User.Claims.First(c => c.Type == "UserID").Value;
+                    //if customer created by sub-admin then customer linked to parent admin (i.e bussiness)
+                    string parentUserId = Id;
+                    if (User.IsInRole(Constants.isSubAdmin))
+                    {
+                        var user = await _userManager.FindByIdAsync(Id);
+                        parentUserId = user.ParentUserId;
+                    } 
+
+                    var customers = new Customers()
+                    {
+                       FirstName=model.FirstName,
+                       LastName=model.LastName,
+                       Phone=model.Phone,
+                       Fax=model.Fax,
+                       Mobile=model.Mobile,
+                       Address1=model.Address1,
+                       Address2=model.Address2,
+                       BillingAddress=model.BillingAddress,
+                       MailingAddress=model.MailingAddress,
+                       CountryId=model.CountryId,
+                       StateId=model.StateId,
+                       City=model.City,
+                       Postalcode=model.Postalcode,
+                       PersonalEmail=model.PersonalEmail,
+                       BussinessEmail=model.BussinessEmail,
+                       Gender=model.Gender,
+                       Dob=(!string.IsNullOrWhiteSpace(model.Dob))? DateTime.ParseExact(model.Dob, "dd/MM/yyyy", null):(DateTime?)null,
+                       Gstin=model.Gstin,
+                       AccountNumber=Convert.ToInt64(model.AccountNumber),
+                       PosoNumber=model.PosoNumber,
+                       Website=model.Website,
+                       IsActive=true,
+                       UserId=parentUserId,
+                       CreatedBy = Id,
+                       CreatedDate = DateTime.Now
+                    };
+                    var retId = await _managementService.AddCustomer(customers);
+                    if (retId > 0)
+                    {
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer created successfully." });
+                    }
+                    else if (retId < 0)
+                    {
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "customer with same email already exists." });
+                    }
+                    else
+                    {
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "db connection error." });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                }
+            }
+            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct." });
+        }
+        #endregion
+
+
+        #region " Update Customer"
+        [HttpPost]
+        [Authorize(Roles = "admin, subadmin")]
+        [Route("UpdateCustomer")]
+        public async Task<IActionResult> UpdateCustomer(CustomerViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    //get user id from access token i.e authorized user
+                    string Id = User.Claims.First(c => c.Type == "UserID").Value;
+                    var user = await _userManager.FindByIdAsync(Id);
+                    model.UserId = user.Id;
+                    var retId = await _managementService.UpdateCustomer(model);
+                    if (retId > 0)
+                    {
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer updated successfully." });
+                    }
+                    else if (retId < 0)
+                    {
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "customer with same email already exists." });
                     }
                     else
                     {

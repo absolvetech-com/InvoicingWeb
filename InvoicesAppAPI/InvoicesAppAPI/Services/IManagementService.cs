@@ -26,5 +26,9 @@ namespace InvoicesAppAPI.Services
         Task<long> AddCountry(Countries model);
 
         Task<long> AddState(States model);
+
+        Task<long> AddCustomer(Customers model);
+
+        Task<long> UpdateCustomer(CustomerViewModel model);
     }
 }
