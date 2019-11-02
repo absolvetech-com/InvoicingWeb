@@ -10,7 +10,8 @@ import { SubHeaderComponent } from './sub-header/sub-header.component';
     CommonModule
   ],
   declarations: [AsideComponent, FooterComponent, HeaderComponent, SubHeaderComponent],
-  exports: [AsideComponent,
+  exports: [
+    AsideComponent,
     FooterComponent,
     HeaderComponent,
     SubHeaderComponent
