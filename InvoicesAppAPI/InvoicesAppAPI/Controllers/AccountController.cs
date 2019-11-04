@@ -81,7 +81,8 @@ namespace InvoicesAppAPI.Controllers
                     if(result.Succeeded)
                     {
                         //send email here
-                        //await _emailSender.SendEmailAsync( email: applicationUser.Email, subject: "Confirm Email", message: applicationUser.ConfirmationCode);
+                        var msg= $"Hi {applicationUser.Name}, <br/><br/> Your confirmation code to access your account is {applicationUser.ConfirmationCode}. <br/><br/>Thanks";
+                        await _emailSender.SendEmailAsync( email: applicationUser.Email, subject: "Confirm Email", htmlMessage: msg);
 
                         if (model.Role == Constants.isAdmin && result.Succeeded)
                         {
@@ -105,6 +106,7 @@ namespace InvoicesAppAPI.Controllers
                         }
                         else if (model.Role == Constants.isSubAdmin && result.Succeeded)
                         { 
+                            //5 sub admin check later
                             return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user registered succesfully." });
                         }
                         else
@@ -154,11 +156,14 @@ namespace InvoicesAppAPI.Controllers
                     //check email is confirmed
                     if (!_userManager.IsEmailConfirmedAsync(user).Result)
                     { 
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "email not confirmed.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "email not confirmed.", userstatus });
                     }
+                    // update user with device type and device token
+                    user.DeviceToken = model.DeviceToken;
+                    user.DeviceType = model.DeviceType;
                     // change the security stamp only on correct username/password
                     await _userManager.UpdateSecurityStampAsync(user);
-                    //Get role assigned to the user
+                    // Get role assigned to the user
                     var roles = await _userManager.GetRolesAsync(user);
                     IdentityOptions _options = new IdentityOptions();
 
@@ -277,8 +282,9 @@ namespace InvoicesAppAPI.Controllers
                         IdentityResult res = await _userManager.UpdateAsync(user);
                         if(res.Succeeded)
                         {
-                            //sent email here with code using await 
-                            //await _userManager.SendEmailAsync(user.Id, "Reset Password", $"Please reset your password by using this {code}"); 
+                            //sent email here with code using await  
+                            var msg = $"Hi {user.Name}, <br/><br/> Your one time password is {code} for reseting password on invoicing. <br/><br/> Thanks";
+                            await _emailSender.SendEmailAsync(email: user.Email, subject: "Reset Password", htmlMessage: msg); 
                             return Ok(new { status = StatusCodes.Status200OK, success = true, message = "OTP sent on your email.", userstatus });
                         }
                         else

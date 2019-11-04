@@ -1,4 +1,5 @@
 ﻿using InvoicesAppAPI.Entities;
+using InvoicesAppAPI.Helpers;
 using InvoicesAppAPI.Models;
 using InvoicesAppAPI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -225,6 +226,137 @@ namespace InvoicesAppAPI.Repositories
                     return -1;
             }
             return 0;
+        }
+
+        public async Task<CustomerViewModel> GetCustomerById(long? Id)
+        {
+            if (db != null)
+            {
+                return await (from c in db.Customers
+                              join cntry in db.Countries
+                              on c.CountryId equals cntry.CountryId into ctryGroup
+                              from cntry in ctryGroup.DefaultIfEmpty()
+                              join s in db.States
+                              on c.StateId equals s.StateId into sGroup
+                              from s in sGroup.DefaultIfEmpty()
+                              where c.CustomerId == Id
+                              select new CustomerViewModel
+                              {
+                                  CustomerId=c.CustomerId,
+                                  FirstName=c.FirstName,
+                                  LastName=c.LastName,
+                                  Phone=c.Phone,
+                                  Fax=c.Fax,
+                                  Mobile=c.Mobile,
+                                  Address1=c.Address1,
+                                  Address2 = c.Address2,
+                                  BillingAddress=c.BillingAddress,
+                                  MailingAddress=c.MailingAddress,
+                                  CountryId = Convert.ToInt64(c.CountryId),
+                                  CountryName = cntry.Name,
+                                  StateId = Convert.ToInt64(c.StateId),
+                                  StateName = s.Name,
+                                  City = c.City,
+                                  Postalcode = c.Postalcode,
+                                  PersonalEmail = c.PersonalEmail,
+                                  BussinessEmail = c.BussinessEmail,
+                                  Gender = c.Gender,
+                                  Dob = (c.Dob != null)? c.Dob.Value.ToString("dd/MM/yyyy"):"", 
+                                  Gstin = c.Gstin,
+                                  AccountNumber = c.AccountNumber.ToString(),
+                                  PosoNumber = c.PosoNumber,
+                                  Website = c.Website,
+                                  IsActive=Convert.ToBoolean(c.IsActive),
+                                  UserId=c.UserId
+            }).FirstOrDefaultAsync();
+            }
+            return null;
+        }
+
+        public async Task<bool> DeleteCustomer(CustomerViewModel model)
+        {
+            if (db != null)
+            {
+                Customers objCustomer = new Customers();
+                objCustomer = db.Customers.Where(x => x.CustomerId == model.CustomerId).FirstOrDefault();
+                objCustomer.IsDeleted = true;
+                objCustomer.DeletedBy = model.UserId;
+                objCustomer.DeletedDate = DateTime.Now;
+                db.Customers.Update(objCustomer);
+                await db.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<object> GetCustomerList(FilterationViewModel model)
+        {
+            if (db != null)
+            {
+                var customers = (from c in db.Customers
+                                 join cntry in db.Countries
+                                 on c.CountryId equals cntry.CountryId into ctryGroup
+                                 from cntry in ctryGroup.DefaultIfEmpty()
+                                 join s in db.States
+                                 on c.StateId equals s.StateId into sGroup
+                                 from s in sGroup.DefaultIfEmpty()
+                                 where c.UserId == model.UserId && (c.IsDeleted == false || c.IsDeleted == null)
+                                       select new CustomerViewModel
+                                       {
+                                           CustomerId = c.CustomerId,
+                                           FirstName = c.FirstName,
+                                           LastName = c.LastName,
+                                           Phone = c.Phone,
+                                           Fax = c.Fax,
+                                           Mobile = c.Mobile,
+                                           Address1 = c.Address1,
+                                           Address2 = c.Address2,
+                                           BillingAddress = c.BillingAddress,
+                                           MailingAddress = c.MailingAddress,
+                                           CountryId = Convert.ToInt64(c.CountryId),
+                                           CountryName = cntry.Name,
+                                           StateId = Convert.ToInt64(c.StateId),
+                                           StateName = s.Name,
+                                           City = c.City,
+                                           Postalcode = c.Postalcode,
+                                           PersonalEmail = c.PersonalEmail,
+                                           BussinessEmail = c.BussinessEmail,
+                                           Gender = c.Gender,
+                                           Dob = (c.Dob != null) ? c.Dob.Value.ToString("dd/MM/yyyy") : "",
+                                           Gstin = c.Gstin,
+                                           AccountNumber = c.AccountNumber.ToString(),
+                                           PosoNumber = c.PosoNumber,
+                                           Website = c.Website,
+                                           IsActive = Convert.ToBoolean(c.IsActive),
+                                           UserId = c.UserId 
+                                       }).AsQueryable();
+
+
+                // searching
+                if (!string.IsNullOrWhiteSpace(model.Search))
+                {
+                    var search = model.Search.ToLower();
+                    customers = customers.Where(x =>
+                                                x.FirstName.ToLower().Contains(search) ||
+                                                x.LastName.ToLower().Contains(search) ||
+                                                x.Phone.ToLower().Contains(search) ||
+                                                x.Fax.ToLower().Contains(search) ||
+                                                x.Mobile.ToLower().Contains(search)
+                                                );
+                }
+
+                // sorting (done with the System.Linq.Dynamic library available on NuGet)
+                customers = customers.OrderBy(m=> model.SortBy + (model.Reverse ? "descending" : ""));
+
+                // paging
+                var customersPaging = customers.Skip((model.Page - 1) * model.ItemsPerPage).Take(model.ItemsPerPage);
+                return new
+                {
+                    count = customers.Count(),
+                    data = customersPaging
+                };
+            }
+            return null;
         }
     }
 }

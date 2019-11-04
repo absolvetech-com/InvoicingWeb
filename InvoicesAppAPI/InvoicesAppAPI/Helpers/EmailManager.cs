@@ -48,7 +48,7 @@ namespace InvoicesAppAPI.Helpers
                     DeliveryMethod = SmtpDeliveryMethod.Network,
                     UseDefaultCredentials = false,
                     Host = _emailSettings.MailServer,
-                    EnableSsl = true,
+                    EnableSsl = true,//false,
                     Credentials = credentials
                 };
 
@@ -59,8 +59,7 @@ namespace InvoicesAppAPI.Helpers
             {
                 // TODO: handle exception
                 throw new InvalidOperationException(ex.Message);
-            }
-
+            } 
             return Task.CompletedTask;
         }
     }

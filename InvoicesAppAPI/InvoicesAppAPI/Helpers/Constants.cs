@@ -14,5 +14,8 @@ namespace InvoicesAppAPI.Helpers
         public static readonly string baseCurrencySymbol = "$";
         public static readonly string baseCurrencyName="AUD";
         public static readonly string baseLanguage = "English";
+
+        //for filteration
+        public static readonly int itemsPerPage = 30;
     }
 }

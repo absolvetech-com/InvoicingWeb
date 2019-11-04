@@ -32,7 +32,7 @@ namespace InvoicesAppAPI.Controllers
 
         #region " Get Currencies List"
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize]
         [Route("CurrencyList")]
         public async Task<IActionResult> GetCurrencyList() 
         {
@@ -56,7 +56,7 @@ namespace InvoicesAppAPI.Controllers
 
         #region " Get Currency By Id"
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize]
         [Route("GetCurrency")]
         public async Task<IActionResult> GetCurrencyById(long? currencyId)
         {
@@ -84,7 +84,7 @@ namespace InvoicesAppAPI.Controllers
 
         #region " Get Countries List"
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize]
         [Route("CountriesList")]
         public async Task<IActionResult> GetCountryList()
         {
@@ -108,7 +108,7 @@ namespace InvoicesAppAPI.Controllers
 
         #region " Get Country By Id"
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize]
         [Route("GetCountry")]
         public async Task<IActionResult> GetCountryById(long? countryId)
         {
@@ -136,7 +136,7 @@ namespace InvoicesAppAPI.Controllers
 
         #region " Get State By Id"
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize]
         [Route("GetStateById")]
         public async Task<IActionResult> GetStateById(long? stateId)
         {
@@ -164,7 +164,7 @@ namespace InvoicesAppAPI.Controllers
 
         #region " Get State By CountryId"
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize]
         [Route("StateListByCountry")]
         public async Task<IActionResult> GetStateByCountry(long? countryId)
         {
@@ -426,6 +426,107 @@ namespace InvoicesAppAPI.Controllers
             }
             return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct." });
         }
+        #endregion
+
+
+        #region " Get Customer By Id"
+        [HttpGet]
+        [Authorize]
+        [Route("GetCustomer")]
+        public async Task<IActionResult> GetCustomerById(long? customerId)
+        {
+            try
+            {
+                if (customerId == null)
+                {
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct." });
+                }
+                var customer = await _managementService.GetCustomerById(customerId);
+                if (customer == null)
+                {
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found customer." });
+                }
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer found successfully.", customer });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+            }
+        }
+
+        #endregion
+
+
+        #region " Delete Customer"
+        [HttpPost]
+        [Authorize]
+        [Route("DeleteCustomer")]
+        public async Task<IActionResult> DeleteCustomer(long? customerId)
+        {
+            try
+            {
+                //to get userid from access token
+                string Id = User.Claims.First(c => c.Type == "UserID").Value;
+                if (customerId != null)
+                {
+                    var customer = await _managementService.GetCustomerById(customerId);
+                    if (customer == null)
+                    {
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any customer.", userstatus = false });
+                    }  
+                    customer.UserId = Id;
+                    bool res = await _managementService.DeleteCustomer(customer);
+                    if (res)
+                    {
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer deleted successfully.", userstatus = true });
+                    }
+                    else
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "db connection error", userstatus = false });
+                }
+                return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct", userstatus = false });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+            }
+        }
+        #endregion
+
+
+        #region " Get Customer List"
+        [HttpPost]
+        [Authorize(Roles = "admin, subadmin")]
+        [Route("CustomerList")]
+        public async Task<IActionResult> GetCustomerList(FilterationViewModel model)
+        {
+            try
+            {
+                //to get userid from access token
+                string UId = User.Claims.First(c => c.Type == "UserID").Value;
+                var user = await _userManager.FindByIdAsync(UId);
+                string parentUserId = "";
+                if (User.IsInRole(Constants.isSubAdmin))
+                {
+                    parentUserId = user.ParentUserId;
+                }
+                else
+                {
+                    parentUserId = user.Id;
+                }
+                model.UserId = parentUserId;
+                var customerList = await _managementService.GetCustomerList(model);
+                if (customerList == null)
+                {
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any customer." });
+                }
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer list successfully shown.", customerList });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+            }
+        }
+
         #endregion
     }
 }

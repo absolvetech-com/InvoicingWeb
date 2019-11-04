@@ -14,5 +14,9 @@ namespace InvoicesAppAPI.Entities.Models
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
+        [Required]
+        public string DeviceToken { get; set; }
+        [Required]
+        public string DeviceType { get; set; }
     }
 }

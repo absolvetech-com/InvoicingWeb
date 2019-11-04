@@ -30,5 +30,11 @@ namespace InvoicesAppAPI.Services
         Task<long> AddCustomer(Customers model);
 
         Task<long> UpdateCustomer(CustomerViewModel model);
+
+        Task<CustomerViewModel> GetCustomerById(long? Id);
+
+        Task<bool> DeleteCustomer(CustomerViewModel model);
+
+        Task<object> GetCustomerList(FilterationViewModel model);
     }
 }
