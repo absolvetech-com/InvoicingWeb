@@ -17,7 +17,6 @@ namespace InvoicesAppAPI.Entities
         public string DeviceToken { get; set; }
         public string DeviceType { get; set; } 
         public string AccessToken { get; set; }  
-        public string Signature { get; set; }
         public string ParentUserId { get; set; } 
         public bool UserStatus { get; set; }  
         public bool IsActive { get; set; }

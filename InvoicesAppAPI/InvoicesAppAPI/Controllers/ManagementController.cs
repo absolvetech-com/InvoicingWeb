@@ -134,6 +134,30 @@ namespace InvoicesAppAPI.Controllers
         #endregion
 
 
+        #region " Get Country State List"
+        [HttpGet]
+        [Authorize]
+        [Route("GetCountryStateList")]
+        public async Task<IActionResult> GetCountryStateList()
+        {
+            try
+            {
+                var countriesList = await _managementService.GetCountryStateList();
+                if (countriesList == null)
+                {
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any country." });
+                }
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "country list successfully shown.", countriesList });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+            }
+        }
+
+        #endregion
+
+
         #region " Get State By Id"
         [HttpGet]
         [Authorize]
@@ -514,7 +538,7 @@ namespace InvoicesAppAPI.Controllers
                     parentUserId = user.Id;
                 }
                 model.UserId = parentUserId;
-                var customerList = await _managementService.GetCustomerList(model);
+                var customerList = _managementService.GetCustomerList(model);
                 if (customerList == null)
                 {
                     return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any customer." });

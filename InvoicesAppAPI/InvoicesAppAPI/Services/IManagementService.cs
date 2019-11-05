@@ -1,4 +1,5 @@
 ﻿using InvoicesAppAPI.Entities;
+using InvoicesAppAPI.Entities.Models;
 using InvoicesAppAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,8 @@ namespace InvoicesAppAPI.Services
 
         Task<List<StateViewModel>> GetStateByCountry(long? Id);
 
+        Task<List<CountryStateListViewModel>> GetCountryStateList();
+
         Task<long> AddCurrency(Currencies model);
 
         Task<long> AddCountry(Countries model);
@@ -35,6 +38,6 @@ namespace InvoicesAppAPI.Services
 
         Task<bool> DeleteCustomer(CustomerViewModel model);
 
-        Task<object> GetCustomerList(FilterationViewModel model);
+        ResponseModel<CustomerListViewModel> GetCustomerList(FilterationViewModel model);
     }
 }

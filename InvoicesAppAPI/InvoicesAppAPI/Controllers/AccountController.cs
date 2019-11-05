@@ -151,12 +151,16 @@ namespace InvoicesAppAPI.Controllers
                     return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found any user associated with this email.", userstatus = false });
                 }
                 var userstatus = user.UserStatus;
+                if (!userstatus)
+                {
+                    return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "user blocked or deleted. please contact to administrator", userstatus = false });
+                }
                 if (user != null && userstatus && await _userManager.CheckPasswordAsync(user, model.Password))
                 {
                     //check email is confirmed
                     if (!_userManager.IsEmailConfirmedAsync(user).Result)
                     { 
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "email not confirmed.", userstatus });
+                        return Ok(new { status = StatusCodes.Status200OK, success = false, message = "email not confirmed.", userstatus });
                     }
                     // update user with device type and device token
                     user.DeviceToken = model.DeviceToken;
@@ -225,14 +229,14 @@ namespace InvoicesAppAPI.Controllers
 
         [HttpPost]
         [Route("ConfirmEmail")]
-        public async Task<IActionResult> ConfirmEmail(string email, string code)
+        public async Task<IActionResult> ConfirmEmail(ConfirmEmailViewModel _model)
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(email);
+                var user = await _userManager.FindByEmailAsync(_model.Email);
                 if (user != null)
                 {
-                    bool result = _userService.ConfirmEmail(email, code).Result;
+                    bool result = _userService.ConfirmEmail(_model.Email, _model.Code).Result;
                     var userstatus = user.UserStatus;
                     if (result)
                     {
@@ -274,7 +278,7 @@ namespace InvoicesAppAPI.Controllers
                         // If user has to activate his email to confirm his account, the use code listing below 
                         if (!_userManager.IsEmailConfirmedAsync(user).Result)
                         {
-                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "email not confirmed.", userstatus = false });
+                            return Ok(new { status = StatusCodes.Status200OK, success = false, message = "email not confirmed.", userstatus = false });
                         }
                          
                         int code = CommonMethods.GenerateOTP();
@@ -322,7 +326,7 @@ namespace InvoicesAppAPI.Controllers
                         // If user has to activate his email to confirm his account, the use code listing below 
                         if (!_userManager.IsEmailConfirmedAsync(user).Result)
                         {
-                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "email not confirmed.", userstatus });
+                            return Ok(new { status = StatusCodes.Status200OK, success = false, message = "email not confirmed.", userstatus });
                         }
 
                         var newPassword = model.Password;
@@ -381,6 +385,55 @@ namespace InvoicesAppAPI.Controllers
                     }
                     else
                         return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't any user associated with this email.", userstatus });
+                }
+                else
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+            }
+        }
+
+        #endregion
+
+        #region " ResendEmail "
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("ResendEmail")]
+        public async Task<IActionResult> ResendEmail(ForgotPasswordViewModel model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var user = await _userManager.FindByNameAsync(model.Email);
+                    var userstatus = user.UserStatus;
+                    if (!userstatus)
+                    {
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "user blocked or deleted. please contact to administrator", userstatus = false });
+                    }
+                    if (user.EmailConfirmed)
+                    {
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "email already confirmed", userstatus = false });
+                    }
+                    if (user != null && userstatus)
+                    {  
+                        user.ConfirmationCode = CommonMethods.GenerateOTP().ToString();
+                        IdentityResult res = await _userManager.UpdateAsync(user);
+                        if (res.Succeeded)
+                        {
+                            //sent email here with code using await   
+                            var msg = $"Hi {user.Name}, <br/><br/> Your confirmation code to access your account is {user.ConfirmationCode}. <br/><br/>Thanks";
+                            await _emailSender.SendEmailAsync(email: user.Email, subject: "Confirmation Email", htmlMessage: msg);
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "confirmation code sent on your email.", userstatus });
+                        }
+                        else
+                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus = false });
+                    }
+                    else
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't found any user associated with this email.", userstatus = false });
                 }
                 else
                     return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });

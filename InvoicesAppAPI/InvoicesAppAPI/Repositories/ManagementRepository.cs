@@ -1,4 +1,5 @@
 ﻿using InvoicesAppAPI.Entities;
+using InvoicesAppAPI.Entities.Models;
 using InvoicesAppAPI.Helpers;
 using InvoicesAppAPI.Models;
 using InvoicesAppAPI.Services;
@@ -113,6 +114,33 @@ namespace InvoicesAppAPI.Repositories
                               {
                                   StateId = c.StateId,
                                   Name = c.Name
+                              }).ToListAsync();
+            }
+            return null;
+        }
+
+        public async Task<List<CountryStateListViewModel>> GetCountryStateList()
+        {
+            if (db != null)
+            {
+                return await (from c in db.Countries
+                              where (c.IsDeleted == false || c.IsDeleted == null)
+                              select new CountryStateListViewModel
+                              {
+                                  CountryId = c.CountryId,
+                                  Name = c.Name,
+                                  ShortName = c.ShortName,
+                                  Timezone = c.Timezone,
+                                  CountryCode = c.CountryCode,
+                                  States = (from state in db.States
+                                            where state.CountryId == c.CountryId
+                                            && (state.IsDeleted == false || state.IsDeleted == null)
+                                            select new StateViewModel
+                                            {
+                                                StateId = state.StateId,
+                                                Name = state.Name,
+                                                CountryId = state.CountryId
+                                            }).ToList()
                               }).ToListAsync();
             }
             return null;
@@ -289,7 +317,7 @@ namespace InvoicesAppAPI.Repositories
             return false;
         }
 
-        public async Task<object> GetCustomerList(FilterationViewModel model)
+        public ResponseModel<CustomerListViewModel> GetCustomerList(FilterationViewModel model)
         {
             if (db != null)
             {
@@ -301,21 +329,15 @@ namespace InvoicesAppAPI.Repositories
                                  on c.StateId equals s.StateId into sGroup
                                  from s in sGroup.DefaultIfEmpty()
                                  where c.UserId == model.UserId && (c.IsDeleted == false || c.IsDeleted == null)
-                                       select new CustomerViewModel
+                                       select new CustomerListViewModel
                                        {
                                            CustomerId = c.CustomerId,
                                            FirstName = c.FirstName,
                                            LastName = c.LastName,
                                            Phone = c.Phone,
                                            Fax = c.Fax,
-                                           Mobile = c.Mobile,
-                                           Address1 = c.Address1,
-                                           Address2 = c.Address2,
-                                           BillingAddress = c.BillingAddress,
-                                           MailingAddress = c.MailingAddress,
-                                           CountryId = Convert.ToInt64(c.CountryId),
-                                           CountryName = cntry.Name,
-                                           StateId = Convert.ToInt64(c.StateId),
+                                           Mobile = c.Mobile, 
+                                           CountryName = cntry.Name, 
                                            StateName = s.Name,
                                            City = c.City,
                                            Postalcode = c.Postalcode,
@@ -327,8 +349,7 @@ namespace InvoicesAppAPI.Repositories
                                            AccountNumber = c.AccountNumber.ToString(),
                                            PosoNumber = c.PosoNumber,
                                            Website = c.Website,
-                                           IsActive = Convert.ToBoolean(c.IsActive),
-                                           UserId = c.UserId 
+                                           IsActive = Convert.ToBoolean(c.IsActive) 
                                        }).AsQueryable();
 
 
@@ -345,18 +366,17 @@ namespace InvoicesAppAPI.Repositories
                                                 );
                 }
 
-                // sorting (done with the System.Linq.Dynamic library available on NuGet)
+                // sorting
                 customers = customers.OrderBy(m=> model.SortBy + (model.Reverse ? "descending" : ""));
 
                 // paging
-                var customersPaging = customers.Skip((model.Page - 1) * model.ItemsPerPage).Take(model.ItemsPerPage);
-                return new
-                {
-                    count = customers.Count(),
-                    data = customersPaging
-                };
+                var customersPaging = customers.Skip((model.Page - 1) * model.ItemsPerPage).Take(model.ItemsPerPage); 
+                ResponseModel<CustomerListViewModel> objcust = new ResponseModel<CustomerListViewModel>();
+                objcust.Count = customers.Count();
+                objcust.Data = customersPaging.ToList();
+                return objcust;
             }
             return null;
-        }
+        } 
     }
 }

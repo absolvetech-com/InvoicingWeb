@@ -81,20 +81,26 @@ namespace InvoicesAppAPI.Repositories
         { 
             if (db != null)
             { 
-                var bussiness = await db.BussinessDetails.FirstOrDefaultAsync(x => x.IdentityId == _model.IdentityId); 
+                var bussiness = await db.BussinessDetails.FirstOrDefaultAsync(x => x.IdentityId == _model.IdentityId);
                 if (bussiness != null)
                 {
-                    //update the bussiness 
-                    bussiness.BussinessName = _model.BussinessName;
+                    //update the bussiness
+                    if (!string.IsNullOrWhiteSpace(_model.BussinessName))
+                    {
+                        bussiness.BussinessName = _model.BussinessName;
+                    }
                     if (!string.IsNullOrWhiteSpace(_model.BussinessLogo))
                     {
                         bussiness.BussinessLogo = _model.BussinessLogo;
-                    } 
+                    }
                     if (!string.IsNullOrWhiteSpace(_model.BussinessCoverPhoto))
                     {
                         bussiness.BussinessCoverPhoto = _model.BussinessCoverPhoto;
-                    } 
-                    bussiness.AccountNumber = _model.AccountNumber;
+                    }
+                    if (!string.IsNullOrWhiteSpace(_model.AccountNumber))
+                    {
+                        bussiness.AccountNumber = _model.AccountNumber;
+                    }
                     if (!string.IsNullOrWhiteSpace(_model.BaseCurrencyName))
                     {
                         bussiness.BaseCurrencyName = _model.BaseCurrencyName;
@@ -102,29 +108,71 @@ namespace InvoicesAppAPI.Repositories
                     if (!string.IsNullOrWhiteSpace(_model.BaseCurrencySymbol))
                     {
                         bussiness.BaseCurrencySymbol = _model.BaseCurrencySymbol;
-                    } 
-                    bussiness.CIN = _model.CIN;
-                    bussiness.GSTIN = _model.GSTIN;
-                    bussiness.BussinessSize = _model.BussinessSize;
-                    bussiness.BussinessClass = _model.BussinessClass;
-                    bussiness.Founded = Convert.ToDateTime(_model.Founded);
-                    bussiness.Fax = _model.Fax;
-                    bussiness.WebAddress = _model.WebAddress;
+                    }
+                    if (!string.IsNullOrWhiteSpace(_model.CIN))
+                    {
+                        bussiness.CIN = _model.CIN;
+                    }
+                    if (!string.IsNullOrWhiteSpace(_model.GSTIN))
+                    {
+                        bussiness.GSTIN = _model.GSTIN;
+                    }
+                    if (!string.IsNullOrWhiteSpace(_model.BussinessSize))
+                    {
+                        bussiness.BussinessSize = _model.BussinessSize;
+                    }
+                    if (!string.IsNullOrWhiteSpace(_model.BussinessClass))
+                    {
+                        bussiness.BussinessClass = _model.BussinessClass;
+                    }
+                    if (!string.IsNullOrWhiteSpace(_model.Founded))
+                    {
+                        bussiness.Founded = Convert.ToDateTime(_model.Founded);
+                    }
+                    if (!string.IsNullOrWhiteSpace(_model.Fax))
+                    {
+                        bussiness.Fax = _model.Fax;
+                    }
+                    if (!string.IsNullOrWhiteSpace(_model.WebAddress))
+                    {
+                        bussiness.WebAddress = _model.WebAddress;
+                    }
                     if (!string.IsNullOrWhiteSpace(_model.BussinessEmail))
                     {
                         bussiness.BussinessEmail = _model.BussinessEmail;
-                    } 
+                    }
                     if (!string.IsNullOrWhiteSpace(_model.BussinessPhone))
                     {
                         bussiness.BussinessPhone = _model.BussinessPhone;
-                    } 
-                    bussiness.Address1 = _model.Address1;
-                    bussiness.Address2 = _model.Address2;
-                    bussiness.CountryId = _model.CountryId;
-                    bussiness.StateId = _model.StateId;
-                    bussiness.City = _model.City;
-                    bussiness.Postalcode = _model.Postalcode;
-                    bussiness.Signature = _model.Signature;
+                    }
+                    if (!string.IsNullOrWhiteSpace(_model.Address1))
+                    {
+                        bussiness.Address1 = _model.Address1;
+                    }
+                    if (!string.IsNullOrWhiteSpace(_model.Address2))
+                    {
+                        bussiness.Address2 = _model.Address2;
+                    }
+                    if (_model.CountryId!= 0)
+                    {
+                        bussiness.CountryId = _model.CountryId;
+                    }
+                    if (_model.StateId != 0)
+                    {
+                        bussiness.StateId = _model.StateId;
+                    }
+                    if (!string.IsNullOrWhiteSpace(_model.City))
+                    {
+                        bussiness.City = _model.City;
+                    }
+                    if (!string.IsNullOrWhiteSpace(_model.Postalcode))
+                    {
+                        bussiness.Postalcode = _model.Postalcode;
+                    }
+                    if (!string.IsNullOrWhiteSpace(_model.Signature))
+                    {
+                        bussiness.Signature = _model.Signature;
+                    }
                     bussiness.UpdatedBy = _model.IdentityId;
                     bussiness.UpdatedDate = DateTime.Now;
                     db.BussinessDetails.Update(bussiness);
