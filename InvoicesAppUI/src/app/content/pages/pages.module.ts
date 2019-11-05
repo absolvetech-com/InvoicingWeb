@@ -1,24 +1,30 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HeaderComponent } from './header/header.component';
 import { PagesComponent } from './pages.component';
 import { LayoutModule } from '../layout/layout.module';
 import { PagesRoutingModule } from './pages-routing.module';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { LoginComponent } from './auth/login/login.component';
+import { SignUpComponent } from './auth/sign-up/sign-up.component';
+import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
 
 @NgModule({
   imports: [
     CommonModule,
     LayoutModule,
-    PagesRoutingModule
+    PagesRoutingModule,
   ],
   declarations: [
-    HeaderComponent,
     PagesComponent,
-    DashboardComponent
+    LoginComponent,
+    SignUpComponent,
+    ForgotPasswordComponent,
   ],
   exports: [
-    PagesComponent
+    PagesComponent,
+    LoginComponent,
+    SignUpComponent,
+    ForgotPasswordComponent,
   ]
 })
 export class PagesModule { }
+
