@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { Router, NavigationStart } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,20 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'invoices-app';
+  hiddenHeaderAsideFromDefualtPage = true;
+  constructor(
+    private router: Router) { }
+
+  ngOnInit() {
+    this.router.events.subscribe((defaultpage) => {
+      if (defaultpage instanceof NavigationStart) {
+        debugger
+        if (defaultpage.url === "/login" || defaultpage.url === "/forgot-password" || defaultpage.url === "/sign-up") {
+          this.hiddenHeaderAsideFromDefualtPage = false;
+        } else {
+          this.hiddenHeaderAsideFromDefualtPage = true;
+        }
+      }
+    })
+  }
 }
