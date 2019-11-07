@@ -16,8 +16,10 @@ namespace InvoicesAppAPI.Entities
         public string BussinessLogo { get; set; }
         public string BussinessCoverPhoto { get; set; }
         public string AccountNumber { get; set; }
-        public string BaseCurrencySymbol { get; set; }
-        public string BaseCurrencyName { get; set; }
+        public long CurrencyId { get; set; }
+        public string CurrencyName { get; set; }
+        public string CurrencySymbol { get; set; }
+        public string CurrencyCode { get; set; }
         public string CIN { get; set; }
         public string GSTIN { get; set; }
         public string BussinessSize { get; set; }

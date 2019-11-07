@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using InvoicesAppAPI.Entities;
 using InvoicesAppAPI.Entities.Mobile;
@@ -8,6 +10,7 @@ using InvoicesAppAPI.Helpers;
 using InvoicesAppAPI.Models;
 using InvoicesAppAPI.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -23,12 +26,14 @@ namespace InvoicesAppAPI.Controllers
         private UserManager<ApplicationUser> _userManager;
         private IUserService _userService;
         private IBussinessService _bussinessService;
+        //private IHostingEnvironment _hostingEnvironment;
 
-        public UserController(UserManager<ApplicationUser> userManager, IUserService _service, IBussinessService bussinessService)
+        public UserController(UserManager<ApplicationUser> userManager, IUserService _service, IBussinessService bussinessService)//, IHostingEnvironment hostingEnvironment)
         {
             _userManager = userManager;
             _userService = _service;
             _bussinessService = bussinessService;
+            //_hostingEnvironment = hostingEnvironment;
         }
         #endregion
 
@@ -221,17 +226,17 @@ namespace InvoicesAppAPI.Controllers
 
         #region " Delete Linked User"
         [HttpPost]
-        [Authorize(Roles = "subadmin, admin")]
+        [Authorize(Roles = "admin")]
         [Route("DeleteLinkedUser")]
-        public async Task<IActionResult> DeleteLinkedUser(string linkedUserId)
+        public async Task<IActionResult> DeleteLinkedUser(CommonIdViewModel _model)
         {
             try
             {
                 //to get userid from access token
                 string Id = User.Claims.First(c => c.Type == "UserID").Value;
-                if (!string.IsNullOrEmpty(linkedUserId))
+                if (!string.IsNullOrEmpty(_model._Id))
                 {
-                    var linkeduser = await _userManager.FindByIdAsync(linkedUserId);
+                    var linkeduser = await _userManager.FindByIdAsync(_model._Id);
                     if(linkeduser == null)
                     {
                         return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any linked user.", userstatus = false });
@@ -459,6 +464,94 @@ namespace InvoicesAppAPI.Controllers
             }
         }
         #endregion
+
+
+        #region " Update Bussiness Currency / SetCurrency"
+        [HttpPost]
+        [Authorize]
+        [Route("SetCurrency")]
+        public async Task<IActionResult> UpdateBussinessCurrency(SetCurrencyViewModel _model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    //get userid from access token
+                    string userId = User.Claims.First(c => c.Type == "UserID").Value;
+                    var user = await _userManager.FindByIdAsync(userId);
+                    var userstatus = user.UserStatus;
+                    if (user != null && userstatus)
+                    {
+                        BussinessDetailViewModel _bussinessmodel = new BussinessDetailViewModel();
+                        _bussinessmodel.IdentityId = userId;
+                        _bussinessmodel.CurrencyId = _model.CurrencyId; 
+                        bool result = await _bussinessService.UpdateBussinessProfile(_bussinessmodel);
+                        if (result)
+                        {
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "currency updated successfully.", userstatus });
+                        }
+                        else
+                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "some error occurs", userstatus = false });
+                    }
+                    else
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't find an account with that email or user is blocked.", userstatus = false });
+                }
+                else
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+            }
+        }
+        #endregion
+
+
+        #region " Update Bussiness Logo / Profile Pic"
+        //[HttpPost]
+        //[Authorize]
+        //[Route("UpdateBussinessLogo")]
+        //public async Task<IActionResult> UpdateBussinessLogo([FromForm]FileUploaderViewModel _model)
+        //{
+        //    try
+        //    {
+        //        if (ModelState.IsValid)
+        //        {
+        //            var filename = ContentDispositionHeaderValue.Parse(_model.Image.ContentDisposition).FileName.Trim('"');
+        //            filename = this.EnsureCorrectFilename(filename);
+
+        //            using (FileStream output = System.IO.File.Create(this.GetPathAndFilename(filename)))
+        //            {
+        //                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "logo updated successfully.", userstatus = true });
+        //            }  
+        //        }
+        //        else
+        //            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+        //    }
+        //}
+
+
+        //private string EnsureCorrectFilename(string filename)
+        //{
+        //    if (filename.Contains("\\"))
+        //        filename = filename.Substring(filename.LastIndexOf("\\") + 1); 
+        //    return filename;
+        //}
+
+        //private string GetPathAndFilename(string filename)
+        //{
+        //    string path = _hostingEnvironment.WebRootPath + "\\BussinessUploads\\"; 
+        //    if (!Directory.Exists(path))
+        //        Directory.CreateDirectory(path); 
+        //    return path + filename;
+        //}
+
+        #endregion
+
         #endregion
     }
 }

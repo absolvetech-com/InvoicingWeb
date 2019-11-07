@@ -175,12 +175,6 @@ namespace InvoicesAppAPI.Migrations
                     b.Property<string>("Address2")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("BaseCurrencyName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BaseCurrencySymbol")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("BussinessClass")
                         .HasColumnType("nvarchar(max)");
 
@@ -216,6 +210,9 @@ namespace InvoicesAppAPI.Migrations
 
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<long?>("CurrencyId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("nvarchar(max)");
@@ -261,11 +258,7 @@ namespace InvoicesAppAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CountryId");
-
                     b.HasIndex("IdentityId");
-
-                    b.HasIndex("StateId");
 
                     b.ToTable("BussinessDetails");
                 });
@@ -340,8 +333,8 @@ namespace InvoicesAppAPI.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("AccountNumber")
-                        .HasColumnType("int");
+                    b.Property<long>("AccountNumber")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Address1")
                         .HasColumnType("nvarchar(max)");
@@ -446,7 +439,7 @@ namespace InvoicesAppAPI.Migrations
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long?>("CountryId")
+                    b.Property<long>("CountryId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("CreatedBy")
@@ -601,17 +594,9 @@ namespace InvoicesAppAPI.Migrations
 
             modelBuilder.Entity("InvoicesAppAPI.Models.BussinessDetail", b =>
                 {
-                    b.HasOne("InvoicesAppAPI.Models.Countries", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryId");
-
                     b.HasOne("InvoicesAppAPI.Models.ApplicationUser", "Identity")
                         .WithMany()
                         .HasForeignKey("IdentityId");
-
-                    b.HasOne("InvoicesAppAPI.Models.States", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId");
                 });
 
             modelBuilder.Entity("InvoicesAppAPI.Models.Customers", b =>
@@ -629,7 +614,9 @@ namespace InvoicesAppAPI.Migrations
                 {
                     b.HasOne("InvoicesAppAPI.Models.Countries", "Country")
                         .WithMany()
-                        .HasForeignKey("CountryId");
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

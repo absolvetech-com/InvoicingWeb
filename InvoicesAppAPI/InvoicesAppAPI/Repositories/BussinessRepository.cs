@@ -40,6 +40,9 @@ namespace InvoicesAppAPI.Repositories
                               join s in db.States
                               on b.StateId equals s.StateId into sGroup
                               from s in sGroup.DefaultIfEmpty()
+                              join cr in db.Currencies
+                              on b.CurrencyId equals cr.CurrencyId into crGroup
+                              from cr in crGroup.DefaultIfEmpty()
                               where b.IdentityId == Id
                               select new BussinessDetailViewModel
                               {
@@ -50,9 +53,11 @@ namespace InvoicesAppAPI.Repositories
                                   BussinessLogo=b.BussinessLogo,
                                   BussinessCoverPhoto=b.BussinessCoverPhoto,
                                   AccountNumber=b.AccountNumber,
-                                  BaseCurrencySymbol=b.BaseCurrencySymbol,
-                                  BaseCurrencyName=b.BaseCurrencyName,
-                                  CIN=b.CIN,
+                                  CurrencyId= Convert.ToInt32(b.CurrencyId),
+                                  CurrencyName = cr.Name,
+                                  CurrencySymbol = cr.Symbol,
+                                  CurrencyCode = cr.Code,
+                                  CIN =b.CIN,
                                   GSTIN=b.GSTIN,
                                   BussinessSize=b.BussinessSize,
                                   BussinessClass=b.BussinessClass,
@@ -100,14 +105,10 @@ namespace InvoicesAppAPI.Repositories
                     if (!string.IsNullOrWhiteSpace(_model.AccountNumber))
                     {
                         bussiness.AccountNumber = _model.AccountNumber;
-                    }
-                    if (!string.IsNullOrWhiteSpace(_model.BaseCurrencyName))
+                    } 
+                    if (_model.CurrencyId != 0)
                     {
-                        bussiness.BaseCurrencyName = _model.BaseCurrencyName;
-                    }
-                    if (!string.IsNullOrWhiteSpace(_model.BaseCurrencySymbol))
-                    {
-                        bussiness.BaseCurrencySymbol = _model.BaseCurrencySymbol;
+                        bussiness.CurrencyId = _model.CurrencyId;
                     }
                     if (!string.IsNullOrWhiteSpace(_model.CIN))
                     {
