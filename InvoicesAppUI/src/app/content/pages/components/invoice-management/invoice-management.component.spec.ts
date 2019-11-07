@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SubHeaderComponent } from './sub-header.component';
+import { InvoiceManagementComponent } from './invoice-management.component';
 
-describe('SubHeaderComponent', () => {
-  let component: SubHeaderComponent;
-  let fixture: ComponentFixture<SubHeaderComponent>;
+describe('InvoiceManagementComponent', () => {
+  let component: InvoiceManagementComponent;
+  let fixture: ComponentFixture<InvoiceManagementComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SubHeaderComponent ]
+      declarations: [ InvoiceManagementComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SubHeaderComponent);
+    fixture = TestBed.createComponent(InvoiceManagementComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
