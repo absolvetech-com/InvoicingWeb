@@ -225,6 +225,7 @@ namespace InvoicesAppAPI.Repositories
                     objCustomer = db.Customers.Where(x => x.CustomerId == model.CustomerId).FirstOrDefault();
                     objCustomer.FirstName = model.FirstName;
                     objCustomer.LastName = model.LastName;
+                    objCustomer.BussinessName = model.BussinessName;
                     objCustomer.Phone = model.Phone;
                     objCustomer.Fax = model.Fax;
                     objCustomer.Mobile = model.Mobile;
@@ -273,6 +274,7 @@ namespace InvoicesAppAPI.Repositories
                                   CustomerId=c.CustomerId,
                                   FirstName=c.FirstName,
                                   LastName=c.LastName,
+                                  BussinessName=c.BussinessName,
                                   Phone=c.Phone,
                                   Fax=c.Fax,
                                   Mobile=c.Mobile,
@@ -334,6 +336,7 @@ namespace InvoicesAppAPI.Repositories
                                            CustomerId = c.CustomerId,
                                            FirstName = c.FirstName,
                                            LastName = c.LastName,
+                                           BussinessName = c.BussinessName,
                                            Phone = c.Phone,
                                            Fax = c.Fax,
                                            Mobile = c.Mobile, 
@@ -377,6 +380,75 @@ namespace InvoicesAppAPI.Repositories
                 return objcust;
             }
             return null;
-        } 
+        }
+
+        //item
+
+        public async Task<long> AddItem(Items model)
+        {
+            if (db != null)
+            {
+                await db.Items.AddAsync(model);
+                await db.SaveChangesAsync();
+                return model.ItemId;
+            }
+            return 0;
+        }
+
+        public async Task<long> UpdateItem(ItemViewModel model)
+        {
+            if (db != null)
+            { 
+                Items obj = new Items();
+                obj = db.Items.Where(x => x.ItemId == model.ItemId).FirstOrDefault();
+                obj.Name = model.Name;
+                obj.Description = model.Description;
+                obj.Quantity = model.Quantity;
+                obj.Price = model.Price;
+                obj.Tax = model.Tax; 
+                obj.UpdatedBy = model.UserId;
+                obj.UpdatedDate = DateTime.Now;
+                db.Items.Update(obj);
+                await db.SaveChangesAsync();
+                return 1;
+            }
+            return 0;
+        }
+
+        public async Task<ItemViewModel> GetItemById(long? Id)
+        {
+            if (db != null)
+            {
+                return await (from i in db.Items 
+                              where i.ItemId == Id
+                              select new ItemViewModel
+                              {
+                                  ItemId = i.ItemId,
+                                  Name = i.Name,
+                                  Description = i.Description,
+                                  Quantity = i.Quantity,
+                                  Price = i.Price,
+                                  Tax = i.Tax, 
+                                  UserId = i.UserId
+                              }).FirstOrDefaultAsync();
+            }
+            return null;
+        }
+
+        public async Task<bool> DeleteItem(ItemViewModel model)
+        {
+            if (db != null)
+            {
+                Items obj = new Items();
+                obj = db.Items.Where(x => x.ItemId == model.ItemId).FirstOrDefault();
+                obj.IsDeleted = true;
+                obj.DeletedBy = model.UserId;
+                obj.DeletedDate = DateTime.Now;
+                db.Items.Update(obj);
+                await db.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
     }
 }

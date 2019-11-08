@@ -13,6 +13,7 @@ namespace InvoicesAppAPI.Models
         public long CustomerId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string BussinessName { get; set; }
         public string Phone { get; set; }
         public string Fax { get; set; }
         public string Mobile { get; set; }

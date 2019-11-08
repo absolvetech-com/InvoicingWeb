@@ -30,6 +30,7 @@ namespace InvoicesAppAPI.Services
 
         Task<long> AddState(States model);
 
+        //customer
         Task<long> AddCustomer(Customers model);
 
         Task<long> UpdateCustomer(CustomerViewModel model);
@@ -39,5 +40,14 @@ namespace InvoicesAppAPI.Services
         Task<bool> DeleteCustomer(CustomerViewModel model);
 
         ResponseModel<CustomerListViewModel> GetCustomerList(FilterationViewModel model);
+
+        //item
+        Task<long> AddItem(Items model);
+
+        Task<long> UpdateItem(ItemViewModel model);
+
+        Task<ItemViewModel> GetItemById(long? Id);
+
+        Task<bool> DeleteItem(ItemViewModel model);
     }
 }

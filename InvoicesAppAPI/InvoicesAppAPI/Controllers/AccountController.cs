@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -14,6 +15,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -33,18 +35,21 @@ namespace InvoicesAppAPI.Controllers
         private IBussinessService _bussinessService;
         private IUserService _userService;
         private readonly IEmailManager _emailSender;
+        private IWebHostEnvironment _hostingEnvironment; 
 
         public AccountController(UserManager<ApplicationUser> userManager, 
             IOptions<ApplicationSettings> appSettings,
             IBussinessService service,
             IUserService userService,
-            IEmailManager emailSender)
+            IEmailManager emailSender,
+            IWebHostEnvironment hostingEnvironment)
         {
             _userManager = userManager; 
             _appSettings = appSettings.Value; 
             _bussinessService = service;
             _userService = userService;
             _emailSender = emailSender;
+            _hostingEnvironment = hostingEnvironment; 
         }
 
         #endregion
@@ -196,11 +201,11 @@ namespace InvoicesAppAPI.Controllers
                     var tokenHandler = new JwtSecurityTokenHandler();
                     var securityToken = tokenHandler.CreateToken(tokenDescriptor);
                     var accessToken = tokenHandler.WriteToken(securityToken);
-                    List<Permissions> permissionList = new List<Permissions>();
-                    UserInfo _userinfo = new UserInfo();
+                    List<Permissions> permissionList = new List<Permissions>(); 
+                    UserInfo _userinfo = new UserInfo(); 
                     _userinfo.Id = user.Id;
                     _userinfo.Name = user.Name;
-                    _userinfo.ProfilePic = (user.ProfilePic!=null)? user.ProfilePic :""; 
+                    _userinfo.ProfilePic = (user.ProfilePic!=null && user.ProfilePic!= "") ? GetImageUrl(Constants.userImagesContainer,user.ProfilePic) :""; 
                     _userinfo.Email = user.Email;
                     _userinfo.Status = user.IsActive;
                     _userinfo.CurrencyId = (bussiness != null) ? bussiness.CurrencyId : 0;
@@ -361,6 +366,7 @@ namespace InvoicesAppAPI.Controllers
         #region " ChangePassword "
 
         [HttpPost]
+        [Authorize]
         [Route("ChangePassword")]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         { 
@@ -370,8 +376,7 @@ namespace InvoicesAppAPI.Controllers
                 {
                     //get userid from access token
                     string userId = User.Claims.First(c => c.Type == "UserID").Value;
-                    var user = await _userManager.FindByIdAsync(userId);
-                    //var user = await _userManager.FindByNameAsync(model.Email);
+                    var user = await _userManager.FindByIdAsync(userId); 
                     var userstatus = user.UserStatus;
                     if (user != null && userstatus)
                     { 
@@ -448,6 +453,126 @@ namespace InvoicesAppAPI.Controllers
 
         #endregion
 
+        #region " Change Email "
+
+        [HttpPost]
+        [Authorize]
+        [Route("ChangeEmail")]
+        public async Task<IActionResult> ChangeEmail(ChangeEmailViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+                } 
+                var newUser = await _userManager.FindByNameAsync(model.NewEmail) ?? await _userManager.FindByEmailAsync(model.NewEmail); 
+                if (newUser == null)
+                {
+                    //get userid from access token
+                    string userId = User.Claims.First(c => c.Type == "UserID").Value;
+                    var user = await _userManager.FindByIdAsync(userId);
+                    var userstatus = user.UserStatus;
+                    if (user != null && userstatus)
+                    {
+                        // If user has to activate his email to confirm his account, the use code listing below 
+                        if (!_userManager.IsEmailConfirmedAsync(user).Result)
+                        {
+                            return Ok(new { status = StatusCodes.Status200OK, success = false, message = "email not confirmed.", userstatus });
+                        } 
+                        user.Otp = CommonMethods.GenerateOTP();
+                        user.Newemail = model.NewEmail;
+                        user.EmailOtp = CommonMethods.GenerateOTP();
+                        IdentityResult res = await _userManager.UpdateAsync(user);
+                        if (res.Succeeded)
+                        {
+                            //sent email on old email here with code using await  
+                            var msg = $"Hi {user.Name}, <br/><br/> Your one time password is {user.Otp} for changing email on invoicing. <br/><br/> Thanks";
+                            await _emailSender.SendEmailAsync(email: user.Email, subject: "Reset Email", htmlMessage: msg);
+                            //sent email on new email here with code using await  
+                            var newmsg = $"Hi {user.Name}, <br/><br/> Your confirmation code to access your account is {user.EmailOtp} on invoicing. <br/><br/> Thanks";
+                            await _emailSender.SendEmailAsync(email: user.Newemail, subject: "Reset Email", htmlMessage: newmsg);
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "Reset email OTP sent on your both emails.", userstatus });
+                        }
+                        else
+                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus = false });
+                    }
+                    else
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't found any user associated with this email.", userstatus = false });
+                }
+                else
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "the email provided already in used. please try with other email", userstatus = false });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+            }
+        }
+
+        #endregion
+
+        #region " Reset Email "
+
+        [HttpPost]
+        [Authorize]
+        [Route("ResetEmail")]
+        public async Task<IActionResult> ResetEmail(ResetEmailViewModel model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    //get userid from access token
+                    string userId = User.Claims.First(c => c.Type == "UserID").Value;
+                    var user = await _userManager.FindByIdAsync(userId); 
+                    var userstatus = user.UserStatus;
+                    if (user != null && userstatus)
+                    {
+                        // If user has to activate his email to confirm his account, the use code listing below 
+                        if (!_userManager.IsEmailConfirmedAsync(user).Result)
+                        {
+                            return Ok(new { status = StatusCodes.Status200OK, success = false, message = "email not confirmed.", userstatus });
+                        }
+                         
+                        if (user.Otp == Convert.ToInt32(model.OldEmailOTP) && user.EmailOtp == Convert.ToInt32(model.NewEmailOTP))
+                        {
+                            user.UserName = user.Newemail;
+                            user.NormalizedUserName = user.Newemail;
+                            user.Email = user.Newemail;
+                            user.NormalizedEmail = user.Newemail;
+                            user.Otp = null;
+                            user.EmailOtp = null;
+                            user.EmailchangeConfirmed = true;
+                            user.EmailchangeCounter = (user.EmailchangeCounter == null || user.EmailchangeCounter == 0) ? 1 : user.EmailchangeCounter + 1;
+                            user.UpdatedBy = userId;
+                            user.UpdatedDate = DateTime.Now;
+                            IdentityResult res = await _userManager.UpdateAsync(user);
+                            if (res.Succeeded)
+                            {
+                                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "email reset successfully. please login with new email.", userstatus });
+                            }
+                            else
+                                return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus = false });                            
+                        }
+                        else
+                        {
+                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "either new or old email otp code is invalid.", userstatus = false }); ;
+                        }
+                    }
+                    else
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't any user associated with this email.", userstatus });
+                }
+                else
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+            }
+        }
+
+        #endregion
+
         #region " Logout "
 
         [Route("Logout")]
@@ -457,8 +582,10 @@ namespace InvoicesAppAPI.Controllers
         {
             try
             {
+                string userId = User.Claims.First(c => c.Type == "UserID").Value;
+                var user = await _userManager.FindByIdAsync(userId);
+                 
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                //return new ObjectResult("Success");
                 return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user logout successfully." });
             }
             catch (Exception ex)
@@ -467,6 +594,19 @@ namespace InvoicesAppAPI.Controllers
             }
         }
 
+        #endregion
+
+         
+        #region " Private Methods "
+        private string GetImageUrl(string foldername, string filename)
+        {
+            //string url = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Request); 
+            string scheme = HttpContext.Request.Scheme.ToString();
+            string host = HttpContext.Request.Host.ToString();
+            string baseUrl = scheme + "://" + host;
+            var path = baseUrl + "/" + foldername + "/" + filename;
+            return path;
+        }
         #endregion
     }
 }

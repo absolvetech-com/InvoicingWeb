@@ -13,8 +13,10 @@ namespace InvoicesAppAPI.Entities.Mobile
         public string Address2 { get; set; }
         [Required]
         public long CountryId { get; set; }
+        public string CountryName { get; set; }
         [Required]
-        public long StateId { get; set; }
+        public long StateId { get; set; } 
+        public string StateName { get; set; }
         [Required]
         public string City { get; set; }
         public string Postalcode { get; set; }

@@ -12,6 +12,7 @@ namespace InvoicesAppAPI.Entities
         [Required]
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string BussinessName { get; set; }
         public string Phone { get; set; }
         public string Fax { get; set; }
         [Required]
@@ -21,19 +22,19 @@ namespace InvoicesAppAPI.Entities
         public string Address2 { get; set; }
         public string BillingAddress { get; set; }
         public string MailingAddress { get; set; }
-        [Required]
+        //[Required]
         public long CountryId { get; set; }
         public string CountryName { get; set; }
-        [Required]
+        //[Required]
         public long StateId { get; set; }
         public string StateName { get; set; }
-        [Required]
+        //[Required]
         public string City { get; set; }
         public string Postalcode { get; set; }
         [Required]
         [EmailAddress]
         public string PersonalEmail { get; set; }
-        [EmailAddress]
+        //[EmailAddress]
         public string BussinessEmail { get; set; }
         public string Gender { get; set; }
         public string Dob { get; set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using InvoicesAppAPI.Entities;
+using InvoicesAppAPI.Entities.Mobile;
 using InvoicesAppAPI.Helpers;
 using InvoicesAppAPI.Models;
 using InvoicesAppAPI.Services;
@@ -357,60 +358,61 @@ namespace InvoicesAppAPI.Controllers
                     string Id = User.Claims.First(c => c.Type == "UserID").Value;
                     //if customer created by sub-admin then customer linked to parent admin (i.e bussiness)
                     string parentUserId = Id;
+                    var user = await _userManager.FindByIdAsync(Id);
                     if (User.IsInRole(Constants.isSubAdmin))
-                    {
-                        var user = await _userManager.FindByIdAsync(Id);
-                        parentUserId = user.ParentUserId;
-                    } 
-
+                    { 
+                        parentUserId = user.ParentUserId; 
+                    }
+                    var userstatus = user.UserStatus;
                     var customers = new Customers()
                     {
-                       FirstName=model.FirstName,
-                       LastName=model.LastName,
-                       Phone=model.Phone,
-                       Fax=model.Fax,
-                       Mobile=model.Mobile,
-                       Address1=model.Address1,
-                       Address2=model.Address2,
-                       BillingAddress=model.BillingAddress,
-                       MailingAddress=model.MailingAddress,
-                       CountryId=model.CountryId,
-                       StateId=model.StateId,
-                       City=model.City,
-                       Postalcode=model.Postalcode,
-                       PersonalEmail=model.PersonalEmail,
-                       BussinessEmail=model.BussinessEmail,
-                       Gender=model.Gender,
-                       Dob=(!string.IsNullOrWhiteSpace(model.Dob))? DateTime.ParseExact(model.Dob, "dd/MM/yyyy", null):(DateTime?)null,
-                       Gstin=model.Gstin,
-                       AccountNumber=Convert.ToInt64(model.AccountNumber),
-                       PosoNumber=model.PosoNumber,
-                       Website=model.Website,
-                       IsActive=true,
-                       UserId=parentUserId,
-                       CreatedBy = Id,
-                       CreatedDate = DateTime.Now
+                        FirstName = model.FirstName,
+                        LastName = model.LastName,
+                        BussinessName = model.BussinessName,
+                        Phone =model.Phone,
+                        Fax=model.Fax,
+                        Mobile=model.Mobile,
+                        Address1=model.Address1,
+                        Address2=model.Address2,
+                        BillingAddress=model.BillingAddress,
+                        MailingAddress=model.MailingAddress,
+                        CountryId=model.CountryId,
+                        StateId=model.StateId,
+                        City=model.City,
+                        Postalcode=model.Postalcode,
+                        PersonalEmail=model.PersonalEmail,
+                        BussinessEmail=model.BussinessEmail,
+                        Gender=model.Gender,
+                        Dob=(!string.IsNullOrWhiteSpace(model.Dob))? DateTime.ParseExact(model.Dob, "dd/MM/yyyy", null):(DateTime?)null,
+                        Gstin=model.Gstin,
+                        AccountNumber=Convert.ToInt64(model.AccountNumber),
+                        PosoNumber=model.PosoNumber,
+                        Website=model.Website,
+                        IsActive=true,
+                        UserId=parentUserId,
+                        CreatedBy = Id,
+                        CreatedDate = DateTime.Now
                     };
                     var retId = await _managementService.AddCustomer(customers);
                     if (retId > 0)
                     {
-                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer created successfully." });
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer created successfully.", userstatus });
                     }
                     else if (retId < 0)
                     {
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "customer with same email already exists." });
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "customer with same email already exists.", userstatus=false });
                     }
                     else
                     {
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "db connection error." });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "db connection error.", userstatus = false });
                     }
                 }
                 catch (Exception ex)
                 {
-                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
                 }
             }
-            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct." });
+            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
         }
         #endregion
 
@@ -428,27 +430,28 @@ namespace InvoicesAppAPI.Controllers
                     //get user id from access token i.e authorized user
                     string Id = User.Claims.First(c => c.Type == "UserID").Value;
                     var user = await _userManager.FindByIdAsync(Id);
+                    var userstatus = user.UserStatus;
                     model.UserId = user.Id;
                     var retId = await _managementService.UpdateCustomer(model);
                     if (retId > 0)
                     {
-                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer updated successfully." });
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer updated successfully.", userstatus });
                     }
                     else if (retId < 0)
                     {
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "customer with same email already exists." });
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "customer with same email already exists.", userstatus = false });
                     }
                     else
                     {
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "db connection error." });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "db connection error.", userstatus = false });
                     }
                 }
                 catch (Exception ex)
                 {
-                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
                 }
             }
-            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct." });
+            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
         }
         #endregion
 
@@ -485,29 +488,33 @@ namespace InvoicesAppAPI.Controllers
         [HttpPost]
         [Authorize]
         [Route("DeleteCustomer")]
-        public async Task<IActionResult> DeleteCustomer(long? customerId)
+        public async Task<IActionResult> DeleteCustomer(CommonIdViewModel model)
         {
             try
             {
-                //to get userid from access token
-                string Id = User.Claims.First(c => c.Type == "UserID").Value;
-                if (customerId != null)
+                if (ModelState.IsValid)
                 {
+                    //to get userid from access token
+                    string Id = User.Claims.First(c => c.Type == "UserID").Value;
+                    var user = await _userManager.FindByIdAsync(Id);
+                    var userstatus = user.UserStatus;
+                    long? customerId = Convert.ToInt32(model._Id); 
                     var customer = await _managementService.GetCustomerById(customerId);
                     if (customer == null)
                     {
                         return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any customer.", userstatus = false });
-                    }  
+                    }
                     customer.UserId = Id;
                     bool res = await _managementService.DeleteCustomer(customer);
                     if (res)
                     {
-                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer deleted successfully.", userstatus = true });
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer deleted successfully.", userstatus });
                     }
                     else
                         return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "db connection error", userstatus = false });
                 }
-                return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct", userstatus = false });
+                else
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct", userstatus = false });
             }
             catch (Exception ex)
             {
@@ -538,19 +545,146 @@ namespace InvoicesAppAPI.Controllers
                     parentUserId = user.Id;
                 }
                 model.UserId = parentUserId;
+                var userstatus = user.UserStatus;
                 var customerList = _managementService.GetCustomerList(model);
                 if (customerList == null)
                 {
-                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any customer." });
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any customer.", userstatus=false });
                 }
-                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer list successfully shown.", customerList });
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer list successfully shown.", userstatus, customerList });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
             }
         }
 
+        #endregion
+
+        //item
+        #region " Create Item"
+        [HttpPost]
+        [Authorize(Roles = "admin, subadmin")]
+        [Route("CreateItem")]
+        public async Task<IActionResult> CreateItem(ItemViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    //get user id from access token i.e authorized user
+                    string Id = User.Claims.First(c => c.Type == "UserID").Value;
+                    //if customer created by sub-admin then customer linked to parent admin (i.e bussiness)
+                    string parentUserId = Id;
+                    var user = await _userManager.FindByIdAsync(Id);
+                    if (User.IsInRole(Constants.isSubAdmin))
+                    {
+                        parentUserId = user.ParentUserId;
+                    }
+                    var userstatus = user.UserStatus;
+                    var items = new Items()
+                    {
+                        Name = model.Name,
+                        Description = model.Description,
+                        Quantity = model.Quantity,
+                        Price = model.Price,
+                        Tax = model.Tax, 
+                        UserId = parentUserId,
+                        CreatedBy = Id,
+                        CreatedDate = DateTime.Now
+                    };
+                    var retId = await _managementService.AddItem(items);
+                    if (retId > 0)
+                    {
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "item created successfully.", userstatus });
+                    } 
+                    else
+                    {
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "db connection error.", userstatus = false });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                }
+            }
+            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+        }
+        #endregion
+
+
+        #region " Update Item"
+        [HttpPost]
+        [Authorize(Roles = "admin, subadmin")]
+        [Route("UpdateItem")]
+        public async Task<IActionResult> UpdateItem(ItemViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    //get user id from access token i.e authorized user
+                    string Id = User.Claims.First(c => c.Type == "UserID").Value;
+                    var user = await _userManager.FindByIdAsync(Id);
+                    var userstatus = user.UserStatus;
+                    model.UserId = user.Id;
+                    var retId = await _managementService.UpdateItem(model);
+                    if (retId > 0)
+                    {
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "item updated successfully.", userstatus });
+                    } 
+                    else
+                    {
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "db connection error.", userstatus = false });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                }
+            }
+            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+        }
+        #endregion
+
+
+        #region " Delete Item"
+        [HttpPost]
+        [Authorize]
+        [Route("DeleteItem")]
+        public async Task<IActionResult> DeleteItem(CommonNumericIdViewModel model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    //to get userid from access token
+                    string Id = User.Claims.First(c => c.Type == "UserID").Value;
+                    var user = await _userManager.FindByIdAsync(Id);
+                    var userstatus = user.UserStatus;
+                    long? itemId = model._Id;
+                    var item = await _managementService.GetItemById(itemId);
+                    if (item == null)
+                    {
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any item.", userstatus = false });
+                    }
+                    item.UserId = Id;
+                    bool res = await _managementService.DeleteItem(item);
+                    if (res)
+                    {
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "item deleted successfully.", userstatus });
+                    }
+                    else
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "db connection error", userstatus = false });
+                }
+                else
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct", userstatus = false });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+            }
+        }
         #endregion
     }
 }

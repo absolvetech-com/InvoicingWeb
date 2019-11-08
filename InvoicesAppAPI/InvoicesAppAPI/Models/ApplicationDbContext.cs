@@ -17,6 +17,7 @@ namespace InvoicesAppAPI.Models
         public DbSet<Countries> Countries { get; set; }
         public DbSet<States> States { get; set; }
         public DbSet<Currencies> Currencies { get; set; }
-        public DbSet<Customers> Customers { get; set; } 
+        public DbSet<Customers> Customers { get; set; }
+        public DbSet<Items> Items { get; set; }
     }
 }

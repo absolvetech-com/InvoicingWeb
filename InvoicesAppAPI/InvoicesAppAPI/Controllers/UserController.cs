@@ -26,14 +26,14 @@ namespace InvoicesAppAPI.Controllers
         private UserManager<ApplicationUser> _userManager;
         private IUserService _userService;
         private IBussinessService _bussinessService;
-        //private IHostingEnvironment _hostingEnvironment;
+        private IWebHostEnvironment _hostingEnvironment;
 
-        public UserController(UserManager<ApplicationUser> userManager, IUserService _service, IBussinessService bussinessService)//, IHostingEnvironment hostingEnvironment)
+        public UserController(UserManager<ApplicationUser> userManager, IUserService _service, IBussinessService bussinessService, IWebHostEnvironment hostingEnvironment)
         {
             _userManager = userManager;
             _userService = _service;
             _bussinessService = bussinessService;
-            //_hostingEnvironment = hostingEnvironment;
+            _hostingEnvironment = hostingEnvironment;
         }
         #endregion
 
@@ -298,9 +298,9 @@ namespace InvoicesAppAPI.Controllers
                     _userDetails.Phone_no = user.PhoneNumber;
                     _userDetails.Profile_pic = (!string.IsNullOrEmpty(user.ProfilePic))? user.ProfilePic :""; 
                     _userDetails.userstatus = user.UserStatus; 
-                    _userDetails.Company_name = bussiness.BussinessName;
-                    _userDetails.Web_address = bussiness.WebAddress;
-                    _userDetails.Fax = bussiness.Fax;
+                    _userDetails.Company_name = (!string.IsNullOrEmpty(bussiness.BussinessName)) ? bussiness.BussinessName : "";
+                    _userDetails.Web_address = (!string.IsNullOrEmpty(bussiness.WebAddress)) ? bussiness.WebAddress : "";
+                    _userDetails.Fax = (!string.IsNullOrEmpty(bussiness.Fax)) ? bussiness.Fax : "";
                     return new JsonResult(new { status = StatusCodes.Status200OK, success = true, message = "show user profile successfully.", userstatus, user_info = _userDetails });
                 }
                 return new JsonResult(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found any user.", userstatus = false });
@@ -344,9 +344,11 @@ namespace InvoicesAppAPI.Controllers
                     _userDetails.Address1 =(!string.IsNullOrEmpty(bussiness.Address1))? bussiness.Address1 :"";
                     _userDetails.Address2 = (!string.IsNullOrEmpty(bussiness.Address2)) ? bussiness.Address2 : "";
                     _userDetails.CountryId = bussiness.CountryId;
+                    _userDetails.CountryName = (!string.IsNullOrEmpty(bussiness.CountryName)) ? bussiness.CountryName : "";
                     _userDetails.StateId = bussiness.StateId;
-                    _userDetails.City = bussiness.City;
-                    _userDetails.Postalcode = bussiness.Postalcode; 
+                    _userDetails.StateName = (!string.IsNullOrEmpty(bussiness.StateName)) ? bussiness.StateName : "";
+                    _userDetails.City = (!string.IsNullOrEmpty(bussiness.City)) ? bussiness.City : "";
+                    _userDetails.Postalcode = (!string.IsNullOrEmpty(bussiness.Postalcode)) ? bussiness.Postalcode : "";
                     return new JsonResult(new { status = StatusCodes.Status200OK, success = true, message = "show user address successfully.", userstatus, user_info = _userDetails });
                 }
                 return new JsonResult(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found any user address.", userstatus = false });
@@ -507,51 +509,102 @@ namespace InvoicesAppAPI.Controllers
         #endregion
 
 
-        #region " Update Bussiness Logo / Profile Pic"
-        //[HttpPost]
-        //[Authorize]
-        //[Route("UpdateBussinessLogo")]
-        //public async Task<IActionResult> UpdateBussinessLogo([FromForm]FileUploaderViewModel _model)
-        //{
-        //    try
-        //    {
-        //        if (ModelState.IsValid)
-        //        {
-        //            var filename = ContentDispositionHeaderValue.Parse(_model.Image.ContentDisposition).FileName.Trim('"');
-        //            filename = this.EnsureCorrectFilename(filename);
+        #region " Update User Profile Pic"
+        [HttpPost]
+        [Authorize]
+        [Route("UpdateProfilePic")]
+        public async Task<IActionResult> UpdateProfilePic([FromForm]FileUploaderViewModel _model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    //get userid from access token
+                    string userId = User.Claims.First(c => c.Type == "UserID").Value;
+                    var user = await _userManager.FindByIdAsync(userId);
+                    var userstatus = user.UserStatus;
+                    if (user != null && userstatus)
+                    {
+                        var filename = ContentDispositionHeaderValue.Parse(_model.Image.ContentDisposition).FileName.Trim('"');
+                        filename = CommonMethods.EnsureCorrectFilename(filename);
+                        filename = CommonMethods.RenameFileName(filename);
+                        using (FileStream fs = System.IO.File.Create(GetPathAndFilename(filename, Constants.userImagesContainer)))
+                        { 
+                            _model.Image.CopyTo(fs);
+                            fs.Flush(); 
+                        } 
+                        user.ProfilePic = filename; 
+                        user.UpdatedBy = userId;
+                        user.UpdatedDate = DateTime.Now;
+                        IdentityResult res = await _userManager.UpdateAsync(user);
+                        if (res.Succeeded)
+                        {
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user profile pic updated successfully.", userstatus });
+                        }
+                        else
+                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus = false });
+                    }
+                    else
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't find an account with that email or user is blocked.", userstatus = false });
+                }
+                else
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+            }
+        }
+        #endregion
 
-        //            using (FileStream output = System.IO.File.Create(this.GetPathAndFilename(filename)))
-        //            {
-        //                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "logo updated successfully.", userstatus = true });
-        //            }  
-        //        }
-        //        else
-        //            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
-        //    }
-        //}
 
+        #region " Delete Profile Pic"
+        [HttpPost]
+        [Authorize]
+        [Route("DeleteProfilePic")]
+        public async Task<IActionResult> DeleteProfilePic()
+        {
+            try
+            {
+                //get userid from access token
+                string userId = User.Claims.First(c => c.Type == "UserID").Value;
+                var user = await _userManager.FindByIdAsync(userId);
+                var userstatus = user.UserStatus;
+                if (user != null && userstatus)
+                { 
+                    user.ProfilePic = null;
+                    user.UpdatedBy = userId;
+                    user.UpdatedDate = DateTime.Now;
+                    IdentityResult res = await _userManager.UpdateAsync(user);
+                    if (res.Succeeded)
+                    {
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user profile pic deleted successfully.", userstatus });
+                    }
+                    else
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus = false });
+                }
+                else
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't find an account with that email or user is blocked.", userstatus = false });
 
-        //private string EnsureCorrectFilename(string filename)
-        //{
-        //    if (filename.Contains("\\"))
-        //        filename = filename.Substring(filename.LastIndexOf("\\") + 1); 
-        //    return filename;
-        //}
-
-        //private string GetPathAndFilename(string filename)
-        //{
-        //    string path = _hostingEnvironment.WebRootPath + "\\BussinessUploads\\"; 
-        //    if (!Directory.Exists(path))
-        //        Directory.CreateDirectory(path); 
-        //    return path + filename;
-        //}
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+            }
+        }
+        #endregion
 
         #endregion
 
+
+        #region " Private Methods "
+        private string GetPathAndFilename(string filename, string foldername)
+        {
+            string path = _hostingEnvironment.WebRootPath + "//" + foldername + "//";
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            return path + filename;
+        }
         #endregion
     }
 }

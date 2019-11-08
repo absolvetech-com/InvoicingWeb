@@ -14,6 +14,9 @@ namespace InvoicesAppAPI.Helpers
         public static readonly long baseCurrencyId = 1; 
         public static readonly string baseLanguage = "English";
 
+        //folder paths
+        public static readonly string userImagesContainer = "UserImages";
+
         //for filteration
         public static readonly int itemsPerPage = 30;
     }
