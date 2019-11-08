@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { InvoiceManagementComponent } from './invoice-management.component';
+import { VendorManagementComponent } from './vendor-management.component';
 
-describe('InvoiceManagementComponent', () => {
-  let component: InvoiceManagementComponent;
-  let fixture: ComponentFixture<InvoiceManagementComponent>;
+describe('VendorManagementComponent', () => {
+  let component: VendorManagementComponent;
+  let fixture: ComponentFixture<VendorManagementComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ InvoiceManagementComponent ]
+      declarations: [ VendorManagementComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(InvoiceManagementComponent);
+    fixture = TestBed.createComponent(VendorManagementComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

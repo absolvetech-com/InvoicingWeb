@@ -16,7 +16,8 @@
       <div class="col-md-7">
         <ul class="header-right">
           <li>
-            <a data-toggle="modal" data-target="#CreateInvoice" class="creat-invoice"><i class="fas fa-plus"></i>Create
+            <a data-toggle="modal" (click)="openCreateNewInvoice(content)" class="creat-invoice"><i
+                class="fas fa-plus"></i>Create
               Invoice</a>
           </li>
           <!-- <li>
@@ -31,10 +32,42 @@
             <a><i class="fa fa-bell" aria-hidden="true"></i></a>
           </li>
           <li>
-            <a><i class="fas fa-sign-out-alt" [routerLink]="['/login']" routerLinkActive="router-link-active"></i></a>
+            <a><i class="fas fa-sign-out-alt" (click)="logout()"></i></a>
           </li>
         </ul>
       </div>
     </div>
   </div>
 </header>
+
+<ng-template #content let-c="close" let-d="dismiss">
+  <div class="modal-header" style="background-color: #005A9C;">
+    <h4 class="modal-title text-white" id="modal-basic-title">Create New Invoice</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class=" form-group">
+        <label class="font-weight-bold">Invoice Tittle:</label>
+        <input type="text" class="form-control">
+      </div>
+      <div class="form-group">
+        <label class="font-weight-bold">Invoice Number:</label>
+        <input type="text" class="form-control">
+      </div>
+      <div class="form-group">
+        <label class="font-weight-bold">P.O/S.O Number:</label>
+        <input type="text" class="form-control">
+      </div>
+      <div class="form-group">
+        <label class="font-weight-bold">Invoice Date:</label>
+        <input type="text" class="form-control">
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="c('Save click')">Save</button>
+  </div>
+</ng-template>

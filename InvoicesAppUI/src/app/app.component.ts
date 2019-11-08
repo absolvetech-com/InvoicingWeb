@@ -7,18 +7,17 @@ import { Router, NavigationStart } from '@angular/router';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  hiddenHeaderAsideFromDefualtPage = true;
+  hiddenHeaderAside = true;
   constructor(
     private router: Router) { }
 
   ngOnInit() {
     this.router.events.subscribe((defaultpage) => {
       if (defaultpage instanceof NavigationStart) {
-        debugger
-        if (defaultpage.url === "/login" || defaultpage.url === "/forgot-password" || defaultpage.url === "/sign-up") {
-          this.hiddenHeaderAsideFromDefualtPage = false;
+        if (defaultpage.url === "/" || defaultpage.url === "/login" || defaultpage.url === "/forgot-password" || defaultpage.url === "/sign-up") {
+          this.hiddenHeaderAside = false;
         } else {
-          this.hiddenHeaderAsideFromDefualtPage = true;
+          this.hiddenHeaderAside = true;
         }
       }
     })
