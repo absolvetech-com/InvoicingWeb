@@ -14,21 +14,37 @@
       </div>
       <div class="col-md-6 p-0">
         <div class="invoice-formin">
-          <form class="invoice-form">
+          <form class="invoice-form" name="loginForm" [formGroup]="loginForm"
+            (ngSubmit)="loginForm.valid && onSubmit()">
             <div class="form-head">
               <img src="assets/images/logo.png">
             </div>
+
+
             <div class="form-group input-effect">
-              <input class="effect-12" type="text" placeholder="Email">
+              <input type="text" class="form-control effect-12" formControlName="email" placeholder="Email"
+                [ngClass]="{'is-invalid':loginForm.get('email').touched && loginForm.get('email').invalid}" />
+              <div *ngIf="loginForm.get('email').touched && loginForm.get('email').invalid" class="invalid-feedback">
+                <div *ngIf="loginForm.get('email').errors.required">Email Name is required</div>
+                <div *ngIf="loginForm.get('email').errors.email">Email must be a valid email Address</div>
+              </div>
               <span class="focus-bg"></span>
             </div>
+
             <div class="form-group input-effect">
-              <input class="effect-12 " type="password" placeholder="Password">
+              <input type="password" class="form-control effect-12" formControlName="password" placeholder="Password"
+                [ngClass]="{'is-invalid':loginForm.get('password').touched && loginForm.get('password').invalid}" />
+              <div *ngIf="loginForm.get('password').touched && loginForm.get('password').invalid"
+                class="invalid-feedback">
+                <div *ngIf="loginForm.get('password').errors.required">Password is required</div>
+                <div *ngIf="loginForm.get('password').errors.minlength">Password must be a letaset 6 charector</div>
+              </div>
+
               <span class="focus-bg"></span>
             </div>
             <p class="forget-link"><a routerLink="/forgot-password">Forgot Password?</a></p>
             <div class="form-group text-center">
-              <a routerLink="/dashboard" class="btn btn-primary">Login</a>
+              <button class="btn btn-primary" [disabled]="!loginForm.valid" class="btn btn-primary">Login</button>
             </div>
             <!-- <div class="form-group text-center">
 									<p>Or Login With</p>

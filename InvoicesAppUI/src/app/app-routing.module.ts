@@ -1,25 +1,29 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { InvoiceManagementComponent } from './content/pages/components/invoice-management/invoice-management.component';
 import { DashboardComponent } from './content/pages/components/dashboard/dashboard.component';
 import { LoginComponent } from './content/pages/auth/login/login.component';
 import { ForgotPasswordComponent } from './content/pages/auth/forgot-password/forgot-password.component';
 import { SignUpComponent } from './content/pages/auth/sign-up/sign-up.component';
+import { AuthGuard } from './core/guard/auth.guard';
+import { VendorManagementComponent } from './content/pages/components/vendor-management/vendor-management.component';
+import { ExpensesComponent } from './content/pages/components/expenses/expenses.component';
 const routes: Routes = [
 
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   {
     path: 'login',
     component: LoginComponent,
   },
   {
-    path: 'invoice',
-    component: InvoiceManagementComponent
+    path: 'vendor-management',
+    component: VendorManagementComponent
   },
   {
-    path: 'dashboard',
-    component: DashboardComponent
+    path: 'expenses',
+    component: ExpensesComponent
   },
+
   {
     path: 'forgot-password',
     component: ForgotPasswordComponent
