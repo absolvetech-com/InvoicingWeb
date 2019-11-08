@@ -11,8 +11,7 @@ namespace InvoicesAppAPI.Helpers
         public static readonly string isAdmin = "admin";
         public static readonly string isSubAdmin = "subadmin";
 
-        public static readonly string baseCurrencySymbol = "$";
-        public static readonly string baseCurrencyName="AUD";
+        public static readonly long baseCurrencyId = 1; 
         public static readonly string baseLanguage = "English";
 
         //for filteration

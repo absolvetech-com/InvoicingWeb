@@ -12,6 +12,7 @@ using InvoicesAppAPI.Models;
 using InvoicesAppAPI.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -33,13 +34,13 @@ namespace InvoicesAppAPI.Controllers
         private IUserService _userService;
         private readonly IEmailManager _emailSender;
 
-        public AccountController(UserManager<ApplicationUser> userManager,  
+        public AccountController(UserManager<ApplicationUser> userManager, 
             IOptions<ApplicationSettings> appSettings,
             IBussinessService service,
             IUserService userService,
             IEmailManager emailSender)
         {
-            _userManager = userManager;
+            _userManager = userManager; 
             _appSettings = appSettings.Value; 
             _bussinessService = service;
             _userService = userService;
@@ -89,11 +90,10 @@ namespace InvoicesAppAPI.Controllers
                             var bussiness = new BussinessDetail()
                             {
                                 IdentityId = applicationUser.Id,
-                                UniqueBussinessId = Guid.NewGuid().ToString(),
-                                BaseCurrencySymbol = Constants.baseCurrencySymbol,
-                                BaseCurrencyName = Constants.baseCurrencyName,
+                                UniqueBussinessId = Guid.NewGuid().ToString(), 
                                 BussinessEmail = applicationUser.Email,
                                 BussinessPhone = applicationUser.PhoneNumber,
+                                CurrencyId= Constants.baseCurrencyId,
                                 CreatedBy = applicationUser.Id,
                                 CreatedDate = DateTime.Now
                             };
@@ -196,16 +196,18 @@ namespace InvoicesAppAPI.Controllers
                     var tokenHandler = new JwtSecurityTokenHandler();
                     var securityToken = tokenHandler.CreateToken(tokenDescriptor);
                     var accessToken = tokenHandler.WriteToken(securityToken);
+                    List<Permissions> permissionList = new List<Permissions>();
                     UserInfo _userinfo = new UserInfo();
                     _userinfo.Id = user.Id;
                     _userinfo.Name = user.Name;
                     _userinfo.ProfilePic = (user.ProfilePic!=null)? user.ProfilePic :""; 
                     _userinfo.Email = user.Email;
-                    _userinfo.Status = user.IsActive; 
-                    _userinfo.CurrencySymbol = (bussiness!=null && bussiness.BaseCurrencySymbol!="")? bussiness.BaseCurrencySymbol:"";
-                    _userinfo.Currency = (bussiness != null && bussiness.BaseCurrencyName != "") ? bussiness.BaseCurrencyName : "";
-                    _userinfo.UserType = roles.FirstOrDefault();
-                    _userinfo.Permissions_List = null;//send later
+                    _userinfo.Status = user.IsActive;
+                    _userinfo.CurrencyId = (bussiness != null) ? bussiness.CurrencyId : 0;
+                    _userinfo.CurrencySymbol = (bussiness!=null && bussiness.CurrencySymbol != null && bussiness.CurrencySymbol!="")? bussiness.CurrencySymbol: "";
+                    _userinfo.Currency = (bussiness != null && bussiness.CurrencyCode != null && bussiness.CurrencyCode != "") ? bussiness.CurrencyCode : "";
+                    _userinfo.UserType = roles.FirstOrDefault(); 
+                    _userinfo.Permissions_List = permissionList;//send later
                     _userinfo.AccessToken = accessToken;
 
                     var user_info = new Object();
@@ -244,7 +246,7 @@ namespace InvoicesAppAPI.Controllers
                     }
                     else
                     {
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "otp is invalid.", userstatus=false });
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "otp is invalid.", userstatus });
                     }
                 }
                 else
@@ -278,7 +280,7 @@ namespace InvoicesAppAPI.Controllers
                         // If user has to activate his email to confirm his account, the use code listing below 
                         if (!_userManager.IsEmailConfirmedAsync(user).Result)
                         {
-                            return Ok(new { status = StatusCodes.Status200OK, success = false, message = "email not confirmed.", userstatus = false });
+                            return Ok(new { status = StatusCodes.Status200OK, success = false, message = "email not confirmed.", userstatus });
                         }
                          
                         int code = CommonMethods.GenerateOTP();
@@ -416,7 +418,7 @@ namespace InvoicesAppAPI.Controllers
                     }
                     if (user.EmailConfirmed)
                     {
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "email already confirmed", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "email already confirmed", userstatus });
                     }
                     if (user != null && userstatus)
                     {  
@@ -448,13 +450,22 @@ namespace InvoicesAppAPI.Controllers
 
         #region " Logout "
 
-        //[Route("Logout")]
-        //[HttpPost]
-        //public async Task<IActionResult> Logout()
-        //{
-        //    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        //    return new ObjectResult("Success");
-        //}
+        [Route("Logout")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                //return new ObjectResult("Success");
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user logout successfully." });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+            }
+        }
 
         #endregion
     }
