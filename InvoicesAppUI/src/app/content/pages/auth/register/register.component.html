@@ -1,0 +1,72 @@
+<div class="wrapper">
+  <div class="login-block">
+    <div class="row m-0">
+      <div class="col-md-6 p-0">
+        <div class="login-left">
+          <h1>Welcome to <span>Invoice</span></h1>
+          <p>Login to your Account</p>
+          <ul class="socail-icon">
+            <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+            <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+            <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-6 p-0">
+        <div class="invoice-formin">
+
+          <form class="invoice-form" name="registerForm" [formGroup]="registerForm"
+            (ngSubmit)="registerForm.valid && onRegister()">
+            <div class="form-head">
+              <img src="assets/images/logo.png">
+            </div>
+            <div class="form-group input-effect">
+              <input type="text" class="form-control effect-12" formControlName="username" placeholder="Desire Username"
+                [ngClass]="{'is-invalid':registerForm.get('username').touched && registerForm.get('username').invalid}" />
+              <div *ngIf="registerForm.get('username').touched && registerForm.get('username').invalid"
+                class="invalid-feedback">
+                <div *ngIf="registerForm.get('username').errors.required">User Name is required</div>
+              </div>
+              <span class="focus-bg"></span>
+            </div>
+            <div class="form-group input-effect">
+              <input type="text" class="form-control effect-12" formControlName="fullname" placeholder="Full Name"
+                [ngClass]="{'is-invalid':registerForm.get('fullname').touched && registerForm.get('fullname').invalid}" />
+              <div *ngIf="registerForm.get('fullname').touched && registerForm.get('fullname').invalid"
+                class="invalid-feedback">
+                <div *ngIf="registerForm.get('fullname').errors.required">Full Name is required</div>
+              </div>
+              <span class="focus-bg"></span>
+            </div>
+            <div class="form-group input-effect">
+              <input type="text" class="form-control effect-12" formControlName="email" placeholder="Valid Email"
+                [ngClass]="{'is-invalid':registerForm.get('email').touched && registerForm.get('email').invalid}" />
+              <div *ngIf="registerForm.get('email').touched && registerForm.get('email').invalid"
+                class="invalid-feedback">
+                <div *ngIf="registerForm.get('email').errors.required">Email is required</div>
+                <div *ngIf="registerForm.get('email').errors.email">Email must be a valid email Address</div>
+              </div>
+              <span class="focus-bg"></span>
+            </div>
+            <div class="form-group input-effect">
+              <input type="password" class="form-control effect-12" formControlName="password" placeholder="Password"
+                [ngClass]="{'is-invalid':registerForm.get('password').touched && registerForm.get('password').invalid}" />
+              <div *ngIf="registerForm.get('password').touched && registerForm.get('password').invalid"
+                class="invalid-feedback">
+                <div *ngIf="registerForm.get('password').errors.required">Password is required</div>
+                <div *ngIf="registerForm.get('password').errors.minlength">Password must be a letaset 6 charector</div>
+              </div>
+              <span class="focus-bg"></span>
+            </div>
+            <div class="form-group text-center">
+              <button [disabled]="!registerForm.valid" [routerLink]="['/otp']" routerLinkActive="router-link-active"
+                class="btn btn-primary">Register</button>
+            </div>
+            <p class="mt-3 mb-0" style="color: #ccc;">Already have an account?<a class="text-main" routerLink="/login">
+                Login Now</a></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,22 +1,24 @@
 import { Injectable } from '@angular/core';
-import { User } from '../models/users';
+import { SessionService } from '../helpers/session.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  currentUserValue: any;
 
-  constructor() { }
+  constructor(private sessionService: SessionService) { }
 
-  public login(userInfo: User) {
-    localStorage.setItem('ACCESS_TOKEN', "token_key");
-  }
+
 
   public isLoggedIn() {
-    return localStorage.getItem('ACCESS_TOKEN') !== null;
+    debugger;
+    this.sessionService.getToken();
+    return localStorage.getItem('ACCESS_TOKEN')!! === null;
   }
 
   public logout() {
     localStorage.removeItem('ACCESS_TOKEN');
   }
+
 }

@@ -14,7 +14,7 @@ export class AppComponent {
   ngOnInit() {
     this.router.events.subscribe((defaultpage) => {
       if (defaultpage instanceof NavigationStart) {
-        if (defaultpage.url === "/" || defaultpage.url === "/login" || defaultpage.url === "/forgot-password" || defaultpage.url === "/sign-up") {
+        if (defaultpage.url === "/" || defaultpage.url === "/login" || defaultpage.url === "/forgot-password" || defaultpage.url === "/register" || defaultpage.url === "/otp") {
           this.hiddenHeaderAside = false;
         } else {
           this.hiddenHeaderAside = true;
