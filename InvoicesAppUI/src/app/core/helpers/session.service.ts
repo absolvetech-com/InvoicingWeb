@@ -19,6 +19,15 @@ export class SessionService {
     console.log("ewfhbewhbfewhbfbwewefbjwe", token);
   }
 
+  registerUser(data: any) {
+    debugger;
+    const user = JSON.stringify(data);
+    const token = data.user_info.accessToken;
+    localStorage.setItem('_currentToken', token);
+    console.log("ewfhbewhbfewhbfbwewefbjwe", token);
+  }
+
+
   getToken(): string {
     debugger;
     const token = localStorage.getItem('_currentToken');

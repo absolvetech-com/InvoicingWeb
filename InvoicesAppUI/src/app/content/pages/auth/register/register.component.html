@@ -20,21 +20,23 @@
             <div class="form-head">
               <img src="assets/images/logo.png">
             </div>
+
             <div class="form-group input-effect">
-              <input type="text" class="form-control effect-12" formControlName="username" placeholder="Desire Username"
-                [ngClass]="{'is-invalid':registerForm.get('username').touched && registerForm.get('username').invalid}" />
-              <div *ngIf="registerForm.get('username').touched && registerForm.get('username').invalid"
+              <input type="text" class="form-control effect-12" formControlName="name" placeholder="Full Name"
+                [ngClass]="{'is-invalid':registerForm.get('name').touched && registerForm.get('name').invalid}" />
+              <div *ngIf="registerForm.get('name').touched && registerForm.get('name').invalid"
                 class="invalid-feedback">
-                <div *ngIf="registerForm.get('username').errors.required">User Name is required</div>
+                <div *ngIf="registerForm.get('name').errors.required"> Name is required</div>
               </div>
               <span class="focus-bg"></span>
             </div>
             <div class="form-group input-effect">
-              <input type="text" class="form-control effect-12" formControlName="fullname" placeholder="Full Name"
-                [ngClass]="{'is-invalid':registerForm.get('fullname').touched && registerForm.get('fullname').invalid}" />
-              <div *ngIf="registerForm.get('fullname').touched && registerForm.get('fullname').invalid"
+              <input type="text" class="form-control effect-12" maxlength="10" OnlyNumber="true" formControlName="phone"
+                placeholder="Enter Phone Number"
+                [ngClass]="{'is-invalid':registerForm.get('phone').touched && registerForm.get('phone').invalid}" />
+              <div *ngIf="registerForm.get('phone').touched && registerForm.get('phone').invalid"
                 class="invalid-feedback">
-                <div *ngIf="registerForm.get('fullname').errors.required">Full Name is required</div>
+                <div *ngIf="registerForm.get('phone').errors.required">Phone Number is required</div>
               </div>
               <span class="focus-bg"></span>
             </div>
@@ -59,8 +61,7 @@
               <span class="focus-bg"></span>
             </div>
             <div class="form-group text-center">
-              <button [disabled]="!registerForm.valid" [routerLink]="['/otp']" routerLinkActive="router-link-active"
-                class="btn btn-primary">Register</button>
+              <button [disabled]="!registerForm.valid" class="btn btn-primary">Register</button>
             </div>
             <p class="mt-3 mb-0" style="color: #ccc;">Already have an account?<a class="text-main" routerLink="/login">
                 Login Now</a></p>
