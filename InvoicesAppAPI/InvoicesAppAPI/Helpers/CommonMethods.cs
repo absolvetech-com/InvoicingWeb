@@ -14,6 +14,16 @@ namespace InvoicesAppAPI.Helpers
             return rnd.Next(10000, 99999); 
         }
 
+        public static string Generate13UniqueDigits()
+        {  
+            return DateTime.Now.ToString("yyMMddHHmmssf"); 
+        }
+
+        public static string Generate15UniqueDigits()
+        {
+            return DateTime.Now.ToString("yyyyMMddHHmmssf");
+        }
+
         public static string ReplaceWhiteSpaces(string Name)
         {
             return Name.Replace(' ', '-');

@@ -343,7 +343,7 @@ namespace InvoicesAppAPI.Controllers
         }
         #endregion
 
-
+        //customer
         #region " Create Customer"
         [HttpPost]
         [Authorize(Roles = "admin, subadmin")]
@@ -364,6 +364,7 @@ namespace InvoicesAppAPI.Controllers
                         parentUserId = user.ParentUserId; 
                     }
                     var userstatus = user.UserStatus;
+                    string accNo = "1000" + CommonMethods.Generate13UniqueDigits();
                     var customers = new Customers()
                     {
                         FirstName = model.FirstName,
@@ -385,8 +386,8 @@ namespace InvoicesAppAPI.Controllers
                         Gender=model.Gender,
                         Dob=(!string.IsNullOrWhiteSpace(model.Dob))? DateTime.ParseExact(model.Dob, "dd/MM/yyyy", null):(DateTime?)null,
                         Gstin=model.Gstin,
-                        AccountNumber=Convert.ToInt64(model.AccountNumber),
-                        PosoNumber=model.PosoNumber,
+                        AccountNumber=Convert.ToInt64(accNo), //Convert.ToInt64(model.AccountNumber),
+                        PosoNumber =model.PosoNumber,
                         Website=model.Website,
                         IsActive=true,
                         UserId=parentUserId,
@@ -457,23 +458,28 @@ namespace InvoicesAppAPI.Controllers
 
 
         #region " Get Customer By Id"
-        [HttpGet]
+        [HttpPost]
         [Authorize]
         [Route("GetCustomer")]
-        public async Task<IActionResult> GetCustomerById(long? customerId)
+        public async Task<IActionResult> GetCustomerById(CommonNumericIdViewModel model)
         {
             try
             {
-                if (customerId == null)
+                if (ModelState.IsValid)
                 {
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct." });
+                    //get user id from access token i.e authorized user
+                    string Id = User.Claims.First(c => c.Type == "UserID").Value;
+                    var user = await _userManager.FindByIdAsync(Id);
+                    var userstatus = user.UserStatus;
+                    var customer = await _managementService.GetCustomerById(model._Id);
+                    if (customer == null)
+                    {
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found customer.", userstatus=false });
+                    }
+                    return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer found successfully.", userstatus, customer });
                 }
-                var customer = await _managementService.GetCustomerById(customerId);
-                if (customer == null)
-                {
-                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found customer." });
-                }
-                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer found successfully.", customer });
+                else
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct", userstatus = false });
             }
             catch (Exception ex)
             {
@@ -488,7 +494,7 @@ namespace InvoicesAppAPI.Controllers
         [HttpPost]
         [Authorize]
         [Route("DeleteCustomer")]
-        public async Task<IActionResult> DeleteCustomer(CommonIdViewModel model)
+        public async Task<IActionResult> DeleteCustomer(CommonNumericIdViewModel model)
         {
             try
             {
@@ -528,7 +534,7 @@ namespace InvoicesAppAPI.Controllers
         [HttpPost]
         [Authorize(Roles = "admin, subadmin")]
         [Route("CustomerList")]
-        public async Task<IActionResult> GetCustomerList(FilterationViewModel model)
+        public async Task<IActionResult> GetCustomerList(FilterationListViewModel model)
         {
             try
             {
@@ -543,10 +549,9 @@ namespace InvoicesAppAPI.Controllers
                 else
                 {
                     parentUserId = user.Id;
-                }
-                model.UserId = parentUserId;
+                } 
                 var userstatus = user.UserStatus;
-                var customerList = _managementService.GetCustomerList(model);
+                var customerList = _managementService.GetCustomerList(model, parentUserId);
                 if (customerList == null)
                 {
                     return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any customer.", userstatus=false });
@@ -685,6 +690,77 @@ namespace InvoicesAppAPI.Controllers
                 return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
             }
         }
+        #endregion
+
+
+        #region " Get Item By Id"
+        [HttpPost]
+        [Authorize]
+        [Route("GetItem")]
+        public async Task<IActionResult> GetItem(CommonNumericIdViewModel model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    //to get userid from access token
+                    string Id = User.Claims.First(c => c.Type == "UserID").Value;
+                    var user = await _userManager.FindByIdAsync(Id);
+                    var userstatus = user.UserStatus;
+                    var item = await _managementService.GetItemById(model._Id);
+                    if (item == null)
+                    {
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found any item.", userstatus=false });
+                    }
+                    return Ok(new { status = StatusCodes.Status200OK, success = true, message = "item found successfully.", userstatus, item });
+                }
+                else
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct", userstatus = false });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+            }
+        }
+
+        #endregion
+
+
+        #region " Get Item List"
+        [HttpPost]
+        [Authorize(Roles = "admin, subadmin")]
+        [Route("ItemList")]
+        public async Task<IActionResult> GetItemList(FilterationListViewModel model)
+        {
+            try
+            {
+                //to get userid from access token
+                string UId = User.Claims.First(c => c.Type == "UserID").Value;
+                var user = await _userManager.FindByIdAsync(UId);
+                string parentUserId = "";
+                if (User.IsInRole(Constants.isSubAdmin))
+                {
+                    parentUserId = user.ParentUserId;
+                }
+                else
+                {
+                    parentUserId = user.Id;
+                }
+                //model.UserId = parentUserId;
+                var userstatus = user.UserStatus;
+                var itemList = _managementService.GetItemList(model, parentUserId);
+                if (itemList == null)
+                {
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any item.", userstatus = false });
+                }
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "item list successfully shown.", userstatus, itemList });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+            }
+        }
+
         #endregion
     }
 }

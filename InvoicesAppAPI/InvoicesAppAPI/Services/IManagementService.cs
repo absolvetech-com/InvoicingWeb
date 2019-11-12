@@ -39,7 +39,7 @@ namespace InvoicesAppAPI.Services
 
         Task<bool> DeleteCustomer(CustomerViewModel model);
 
-        ResponseModel<CustomerListViewModel> GetCustomerList(FilterationViewModel model);
+        ResponseModel<CustomerListViewModel> GetCustomerList(FilterationListViewModel model, string UserId);
 
         //item
         Task<long> AddItem(Items model);
@@ -49,5 +49,7 @@ namespace InvoicesAppAPI.Services
         Task<ItemViewModel> GetItemById(long? Id);
 
         Task<bool> DeleteItem(ItemViewModel model);
+
+        ResponseModel<ItemViewModel> GetItemList(FilterationListViewModel model, string UserId);
     }
 }

@@ -3,7 +3,9 @@ using InvoicesAppAPI.Entities.Models;
 using InvoicesAppAPI.Helpers;
 using InvoicesAppAPI.Models;
 using InvoicesAppAPI.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -201,7 +203,7 @@ namespace InvoicesAppAPI.Repositories
         {
             if (db != null)
             {
-                bool checkNameExists = db.Customers.Any(x => x.PersonalEmail.ToLower() == model.PersonalEmail.ToLower());
+                bool checkNameExists = db.Customers.Any(x => x.PersonalEmail.ToLower() == model.PersonalEmail.ToLower() && x.UserId == model.UserId);
                 if (!checkNameExists)
                 {
                     await db.Customers.AddAsync(model);
@@ -319,18 +321,19 @@ namespace InvoicesAppAPI.Repositories
             return false;
         }
 
-        public ResponseModel<CustomerListViewModel> GetCustomerList(FilterationViewModel model)
+        public ResponseModel<CustomerListViewModel> GetCustomerList(FilterationListViewModel model, string UserId)
         {
             if (db != null)
             {
-                var customers = (from c in db.Customers
+                var source = (from c in db.Customers
                                  join cntry in db.Countries
                                  on c.CountryId equals cntry.CountryId into ctryGroup
                                  from cntry in ctryGroup.DefaultIfEmpty()
                                  join s in db.States
                                  on c.StateId equals s.StateId into sGroup
                                  from s in sGroup.DefaultIfEmpty()
-                                 where c.UserId == model.UserId && (c.IsDeleted == false || c.IsDeleted == null)
+                                 where c.UserId == UserId && (c.IsDeleted == false || c.IsDeleted == null)
+                                 orderby c.CustomerId descending
                                        select new CustomerListViewModel
                                        {
                                            CustomerId = c.CustomerId,
@@ -344,6 +347,7 @@ namespace InvoicesAppAPI.Repositories
                                            StateName = s.Name,
                                            City = c.City,
                                            Postalcode = c.Postalcode,
+                                           Address1 = c.Address1,
                                            PersonalEmail = c.PersonalEmail,
                                            BussinessEmail = c.BussinessEmail,
                                            Gender = c.Gender,
@@ -357,10 +361,10 @@ namespace InvoicesAppAPI.Repositories
 
 
                 // searching
-                if (!string.IsNullOrWhiteSpace(model.Search))
+                if (!string.IsNullOrWhiteSpace(model.searchQuery))
                 {
-                    var search = model.Search.ToLower();
-                    customers = customers.Where(x =>
+                    var search = model.searchQuery.ToLower();
+                    source = source.Where(x =>
                                                 x.FirstName.ToLower().Contains(search) ||
                                                 x.LastName.ToLower().Contains(search) ||
                                                 x.Phone.ToLower().Contains(search) ||
@@ -369,15 +373,41 @@ namespace InvoicesAppAPI.Repositories
                                                 );
                 }
 
-                // sorting
-                customers = customers.OrderBy(m=> model.SortBy + (model.Reverse ? "descending" : ""));
+                // Get's No of Rows Count   
+                int count = source.Count();
 
-                // paging
-                var customersPaging = customers.Skip((model.Page - 1) * model.ItemsPerPage).Take(model.ItemsPerPage); 
-                ResponseModel<CustomerListViewModel> objcust = new ResponseModel<CustomerListViewModel>();
-                objcust.Count = customers.Count();
-                objcust.Data = customersPaging.ToList();
-                return objcust;
+                // Parameter is passed from Query string if it is null then it default Value will be pageNumber:1  
+                int CurrentPage = model.pageNumber;
+
+                // Parameter is passed from Query string if it is null then it default Value will be pageSize:20  
+                int PageSize = model.pageSize;
+
+                // Display TotalCount to Records to User  
+                int TotalCount = count;
+
+                // Calculating Totalpage by Dividing (No of Records / Pagesize)  
+                int TotalPages = (int)Math.Ceiling(count / (double)PageSize);
+
+                // Returns List of Customer after applying Paging   
+                var items = source.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
+
+                // if CurrentPage is greater than 1 means it has previousPage  
+                var previousPage = CurrentPage > 1 ? "Yes" : "No";
+
+                // if TotalPages is greater than CurrentPage means it has nextPage  
+                var nextPage = CurrentPage < TotalPages ? "Yes" : "No";
+
+                // Returing List of Customers Collections  
+                ResponseModel<CustomerListViewModel> obj = new ResponseModel<CustomerListViewModel>();
+                obj.totalCount = TotalCount;
+                obj.pageSize = PageSize;
+                obj.currentPage = CurrentPage;
+                obj.totalPages = TotalPages;
+                obj.previousPage = previousPage;
+                obj.nextPage = nextPage;
+                obj.searchQuery = string.IsNullOrEmpty(model.searchQuery) ? "no parameter passed" : model.searchQuery;
+                obj.dataList = items.ToList();
+                return obj;
             }
             return null;
         }
@@ -449,6 +479,76 @@ namespace InvoicesAppAPI.Repositories
                 return true;
             }
             return false;
+        }
+
+        public ResponseModel<ItemViewModel> GetItemList(FilterationListViewModel model, string UserId)
+        { 
+            if (db != null)
+            {
+                //Return Lists 
+                var source = (from c in db.Items 
+                                 where c.UserId == UserId && (c.IsDeleted == false || c.IsDeleted == null)
+                                 select new ItemViewModel
+                                 {
+                                     ItemId = c.ItemId,
+                                     Name = c.Name,
+                                     Description = c.Description,
+                                     Quantity = c.Quantity,
+                                     Price = c.Price,
+                                     Tax = c.Tax,
+                                     UserId = c.UserId 
+                                 }).AsQueryable();
+
+                //Search Parameter With null checks   
+                if (!string.IsNullOrWhiteSpace(model.searchQuery))
+                {
+                    var search = model.searchQuery.ToLower();
+                    source = source.Where(x =>
+                                                x.Name.ToLower().Contains(search) ||
+                                                x.Description.ToLower().Contains(search) ||
+                                                x.Quantity.ToString().Contains(search) ||
+                                                x.Price.ToString().Contains(search) ||
+                                                x.Tax.ToString().Contains(search)
+                                                );
+                } 
+
+                // Get's No of Rows Count   
+                int count = source.Count();
+
+                // Parameter is passed from Query string if it is null then it default Value will be pageNumber:1  
+                int CurrentPage = model.pageNumber;
+
+                // Parameter is passed from Query string if it is null then it default Value will be pageSize:20  
+                int PageSize = model.pageSize;
+
+                // Display TotalCount to Records to User  
+                int TotalCount = count;
+
+                // Calculating Totalpage by Dividing (No of Records / Pagesize)  
+                int TotalPages = (int)Math.Ceiling(count / (double)PageSize);
+
+                // Returns List of Customer after applying Paging   
+                var items = source.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
+
+                // if CurrentPage is greater than 1 means it has previousPage  
+                var previousPage = CurrentPage > 1 ? "Yes" : "No";
+
+                // if TotalPages is greater than CurrentPage means it has nextPage  
+                var nextPage = CurrentPage < TotalPages ? "Yes" : "No"; 
+
+                // Returing List of Customers Collections  
+                ResponseModel<ItemViewModel> obj = new ResponseModel<ItemViewModel>();
+                obj.totalCount = TotalCount;
+                obj.pageSize = PageSize;
+                obj.currentPage = CurrentPage;
+                obj.totalPages = TotalPages;
+                obj.previousPage = previousPage;
+                obj.nextPage = nextPage;
+                obj.searchQuery = string.IsNullOrEmpty(model.searchQuery) ? "no parameter passed" : model.searchQuery;
+                obj.dataList = items.ToList();
+                return obj; 
+            }
+            return null;
         }
     }
 }

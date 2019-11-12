@@ -18,6 +18,7 @@ namespace InvoicesAppAPI.Entities
         public string StateName { get; set; }
         public string City { get; set; }
         public string Postalcode { get; set; }
+        public string Address1 { get; set; }
         public string PersonalEmail { get; set; }
         public string BussinessEmail { get; set; }
         public string Gender { get; set; }
