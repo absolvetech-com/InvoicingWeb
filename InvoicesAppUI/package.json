@@ -25,6 +25,7 @@
     "@angular/router": "^8.2.13",
     "@ng-bootstrap/ng-bootstrap": "^5.1.2",
     "core-js": "^3.3.6",
+    "ngx-spinner": "^8.0.3",
     "ngx-toastr": "^11.2.0",
     "rxjs": "^6.5.3",
     "sweetalert2": "^9.1.5",

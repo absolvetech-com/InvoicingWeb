@@ -1,0 +1,35 @@
+<div class="wrapper">
+  <div class="login-block">
+    <div class="row m-0">
+      <div class="col-md-6 p-0">
+        <div class="login-left">
+          <h1>Email <span>Verification</span></h1>
+
+        </div>
+      </div>
+      <div class="col-md-6 p-0">
+        <div class="invoice-formin">
+          <form class="invoice-form" name="verifyOtpForm" [formGroup]="verifyOtpForm"
+            (ngSubmit)="verifyOtpForm.valid && onVerify()">
+            <div class="form-head">
+              <img src="assets/images/logo.png">
+            </div>
+            <div class="form-group input-effect">
+              <div class="form-group input-effect">
+                <input type="text" class="form-control effect-12" formControlName="otp" placeholder="Enter OTP here..."
+                  [ngClass]="{'is-invalid':verifyOtpForm.get('otp').touched && verifyOtpForm.get('otp').invalid}" />
+                <div *ngIf="verifyOtpForm.get('otp').touched && verifyOtpForm.get('otp').invalid"
+                  class="invalid-feedback">
+                  <div *ngIf="verifyOtpForm.get('otp').errors.required">OTP is required</div>
+                </div>
+                <span class="focus-bg"></span>
+              </div>
+              <div class="form-group text-center">
+                <button class="btn btn-primary" [disabled]="!verifyOtpForm.valid">Verify</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>

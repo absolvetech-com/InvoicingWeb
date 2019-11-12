@@ -4,6 +4,8 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { ToastrService } from 'ngx-toastr';
+import { SessionService } from 'src/app/core/helpers/session.service';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'm-header',
@@ -13,7 +15,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class HeaderComponent implements OnInit {
   login: boolean;
-  constructor(config: NgbModalConfig, private modalService: NgbModal, private toaster: ToastrService, private authService: AuthService, private router: Router) {
+  constructor(config: NgbModalConfig, private spinner: NgxSpinnerService, private modalService: NgbModal, private sessionService: SessionService, private toaster: ToastrService, private authService: AuthService, private router: Router) {
     // customize default values of modals used by this component tree
     config.backdrop = 'static';
     config.keyboard = false;
@@ -26,8 +28,13 @@ export class HeaderComponent implements OnInit {
   ngOnInit() {
   }
   logout() {
-    this.authService.logout();
+    this.spinner.show();
+    setTimeout(() => {
+      this.spinner.hide();
+      this.toaster.success("Succusfully Logout");
+    }, 1000);
+    this.sessionService.logout();
     this.router.navigateByUrl('/login');
-    this.toaster.info("Succusfully Logout");
+
   }
 }

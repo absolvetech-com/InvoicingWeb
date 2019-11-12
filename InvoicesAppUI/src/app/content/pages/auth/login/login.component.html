@@ -14,8 +14,7 @@
       </div>
       <div class="col-md-6 p-0">
         <div class="invoice-formin">
-          <form class="invoice-form" name="loginForm" [formGroup]="loginForm"
-            (ngSubmit)="loginForm.valid && onSubmit()">
+          <form class="invoice-form" name="loginForm" [formGroup]="loginForm" (ngSubmit)="loginForm.valid && onLogin()">
             <div class="form-head">
               <img src="assets/images/logo.png">
             </div>
@@ -25,7 +24,7 @@
               <input type="text" class="form-control effect-12" formControlName="email" placeholder="Email"
                 [ngClass]="{'is-invalid':loginForm.get('email').touched && loginForm.get('email').invalid}" />
               <div *ngIf="loginForm.get('email').touched && loginForm.get('email').invalid" class="invalid-feedback">
-                <div *ngIf="loginForm.get('email').errors.required">Email Name is required</div>
+                <div *ngIf="loginForm.get('email').errors.required">Email is required</div>
                 <div *ngIf="loginForm.get('email').errors.email">Email must be a valid email Address</div>
               </div>
               <span class="focus-bg"></span>
@@ -57,11 +56,14 @@
 										</li>
 									</ul>
 								</div> -->
-            <p class="mt-3 mb-0" style="color: #ccc;">New User? <a class="text-main" routerLink="/sign-up">Register
+            <p class="mt-3 mb-0" style="color: #ccc;">New User? <a class="text-main" routerLink="/register">Register
                 Now</a></p>
+            <div *ngIf="error" class="alert alert-danger mt-3 mb-0">{{error}}</div>
           </form>
         </div>
       </div>
     </div>
   </div>
 </div>
+<ngx-spinner type="ball-scale-multiple">
+</ngx-spinner>
