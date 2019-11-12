@@ -541,14 +541,10 @@ namespace InvoicesAppAPI.Controllers
                 //to get userid from access token
                 string UId = User.Claims.First(c => c.Type == "UserID").Value;
                 var user = await _userManager.FindByIdAsync(UId);
-                string parentUserId = "";
+                string parentUserId = user.Id;
                 if (User.IsInRole(Constants.isSubAdmin))
                 {
                     parentUserId = user.ParentUserId;
-                }
-                else
-                {
-                    parentUserId = user.Id;
                 } 
                 var userstatus = user.UserStatus;
                 var customerList = _managementService.GetCustomerList(model, parentUserId);
@@ -737,16 +733,11 @@ namespace InvoicesAppAPI.Controllers
                 //to get userid from access token
                 string UId = User.Claims.First(c => c.Type == "UserID").Value;
                 var user = await _userManager.FindByIdAsync(UId);
-                string parentUserId = "";
+                string parentUserId = user.Id;
                 if (User.IsInRole(Constants.isSubAdmin))
                 {
                     parentUserId = user.ParentUserId;
-                }
-                else
-                {
-                    parentUserId = user.Id;
-                }
-                //model.UserId = parentUserId;
+                } 
                 var userstatus = user.UserStatus;
                 var itemList = _managementService.GetItemList(model, parentUserId);
                 if (itemList == null)

@@ -58,6 +58,7 @@ namespace InvoicesAppAPI
             services.AddScoped<IBussinessService, BussinessRepository>();
             services.AddScoped<IUserService, UserRepository>();
             services.AddScoped<IManagementService, ManagementRepository>();
+            services.AddScoped<IInvoiceService, InvoiceRepository>();
             services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequireDigit = false;
@@ -169,7 +170,7 @@ namespace InvoicesAppAPI
                 RequestPath = new PathString("/UserImages")
             });
 
-            //use for directory browsing
+            //use to enable directory browsing
             //app.UseDirectoryBrowser(new DirectoryBrowserOptions()
             //{
             //    FileProvider = new PhysicalFileProvider(

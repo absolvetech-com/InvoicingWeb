@@ -12,7 +12,7 @@ namespace InvoicesAppAPI.Entities
 
         public int pageNumber { get; set; } = 1;
 
-        public int _pageSize { get; set; } = Constants.itemsPerPage; //10
+        public int _pageSize { get; set; } = Constants.itemsPerPage;
 
         public int pageSize
         {

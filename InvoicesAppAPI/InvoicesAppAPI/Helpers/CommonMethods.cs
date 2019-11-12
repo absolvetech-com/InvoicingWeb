@@ -23,6 +23,18 @@ namespace InvoicesAppAPI.Helpers
         {
             return DateTime.Now.ToString("yyyyMMddHHmmssf");
         }
+         
+        //16 digit timestamp
+        public static string GetShortTimestamp()
+        {
+            return DateTime.Now.ToString("yyMMddHHmmssffff");
+        }
+
+        //18 digit timestamp
+        public static string GetLongTimestamp()
+        {
+            return DateTime.Now.ToString("yyyyMMddHHmmssffff");
+        }
 
         public static string ReplaceWhiteSpaces(string Name)
         {

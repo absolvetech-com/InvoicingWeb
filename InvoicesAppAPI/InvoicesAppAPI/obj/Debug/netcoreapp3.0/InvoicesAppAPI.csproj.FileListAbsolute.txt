@@ -124,4 +124,3 @@ D:\Projects\Invoicing\InvoicesAppAPI\InvoicesAppAPI\obj\Debug\netcoreapp3.0\Invo
 D:\Projects\Invoicing\InvoicesAppAPI\InvoicesAppAPI\obj\Debug\netcoreapp3.0\InvoicesAppAPI.csproj.CopyComplete
 D:\Projects\Invoicing\InvoicesAppAPI\InvoicesAppAPI\obj\Debug\netcoreapp3.0\InvoicesAppAPI.dll
 D:\Projects\Invoicing\InvoicesAppAPI\InvoicesAppAPI\obj\Debug\netcoreapp3.0\InvoicesAppAPI.pdb
-D:\Projects\Invoicing\InvoicesAppAPI\InvoicesAppAPI\obj\Debug\netcoreapp3.0\InvoicesAppAPI.csprojAssemblyReference.cache

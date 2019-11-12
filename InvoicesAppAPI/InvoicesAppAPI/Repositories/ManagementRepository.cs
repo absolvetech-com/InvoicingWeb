@@ -486,18 +486,19 @@ namespace InvoicesAppAPI.Repositories
             if (db != null)
             {
                 //Return Lists 
-                var source = (from c in db.Items 
-                                 where c.UserId == UserId && (c.IsDeleted == false || c.IsDeleted == null)
-                                 select new ItemViewModel
-                                 {
-                                     ItemId = c.ItemId,
-                                     Name = c.Name,
-                                     Description = c.Description,
-                                     Quantity = c.Quantity,
-                                     Price = c.Price,
-                                     Tax = c.Tax,
-                                     UserId = c.UserId 
-                                 }).AsQueryable();
+                var source = (from c in db.Items
+                              where c.UserId == UserId && (c.IsDeleted == false || c.IsDeleted == null)
+                              orderby c.ItemId descending
+                              select new ItemViewModel
+                              {
+                                  ItemId = c.ItemId,
+                                  Name = c.Name,
+                                  Description = c.Description,
+                                  Quantity = c.Quantity,
+                                  Price = c.Price,
+                                  Tax = c.Tax,
+                                  UserId = c.UserId
+                              }).AsQueryable();
 
                 //Search Parameter With null checks   
                 if (!string.IsNullOrWhiteSpace(model.searchQuery))
