@@ -32,8 +32,21 @@ namespace InvoicesAppAPI.Entities
         public string PaymentMode { get; set; }
 
         public long CurrencyId { get; set; }
-        public CurrencyViewModel CurrencyDetails { get; set; }
+        public string CurrencyName { get; set; }  
+        public string CurrencySymbol { get; set; } 
+        public string CurrencyCode { get; set; }
+
         public long CustomerId { get; set; }
-        public CustomerViewModel CustomerDetails { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string BussinessName { get; set; }
+        public string Phone { get; set; } 
+        public string Mobile { get; set; } 
+        public string Address1 { get; set; }
+        public string PersonalEmail { get; set; } 
+        public string BussinessEmail { get; set; }
+        public string Gstin { get; set; }
+        public string AccountNumber { get; set; } 
+        public string Website { get; set; }
     }
 }

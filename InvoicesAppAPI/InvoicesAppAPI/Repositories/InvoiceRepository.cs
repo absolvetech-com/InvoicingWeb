@@ -42,6 +42,7 @@ namespace InvoicesAppAPI.Repositories
                 obj.PosoNumber = model.PosoNumber;
                 obj.Date = DateTime.ParseExact(model.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
                 obj.DueDate = DateTime.ParseExact(model.DueDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                obj.Status = model.Status;
                 obj.ItemList = JsonConvert.SerializeObject(model.ItemList);
                 obj.CurrencyId = model.CurrencyId;
                 obj.Subtotal = model.Subtotal;
@@ -62,9 +63,14 @@ namespace InvoicesAppAPI.Repositories
         public async Task<InvoiceListViewModel> GetInvoiceByInvoiceId(long? Id)
         {
             if (db != null)
-            {
-                List<ItemViewModel> objList = new List<ItemViewModel>(); 
+            { 
                 return await (from i in db.Invoices
+                              join c in db.Currencies
+                              on i.CurrencyId equals c.CurrencyId into cGroup
+                              from c in cGroup.DefaultIfEmpty()
+                              join cst in db.Customers
+                              on i.CustomerId equals cst.CustomerId into cstGroup
+                              from cst in cstGroup.DefaultIfEmpty()
                               where i.InvoiceId == Id
                               select new InvoiceListViewModel
                               {
@@ -83,16 +89,28 @@ namespace InvoicesAppAPI.Repositories
                                   Total = i.Total,
                                   IsSent = i.IsSent,
                                   UserId = i.UserId,
-                                  Notes = i.Notes,
-                                  TermsAndConditions = i.TermsAndConditions,
+                                  Notes = !string.IsNullOrWhiteSpace(i.Notes) ? i.Notes : "",
+                                  TermsAndConditions = !string.IsNullOrWhiteSpace(i.TermsAndConditions) ? i.TermsAndConditions : "",
                                   ConvertedDate = (i.ConvertedDate != null) ? i.ConvertedDate.Value.ToString("dd/MM/yyyy") : "",
                                   IsPaid = i.IsPaid,
                                   PaymentDate = (i.PaymentDate != null) ? i.PaymentDate.Value.ToString("dd/MM/yyyy") : "",
                                   PaymentMode = (i.PaymentMode != null) ? i.PaymentMode : "",
                                   CurrencyId = i.CurrencyId,
-                                  //CurrencyDetails = { },
+                                  CurrencyName = c.Name,
+                                  CurrencyCode=c.Code,
+                                  CurrencySymbol=c.Symbol,
                                   CustomerId = i.CustomerId,
-                                  //CustomerDetails = { }
+                                  FirstName=cst.FirstName,
+                                  LastName=cst.LastName,
+                                  BussinessName = cst.BussinessName,
+                                  Phone = cst.Phone, 
+                                  Mobile = cst.Mobile,   
+                                  Address1 = cst.Address1,
+                                  PersonalEmail = cst.PersonalEmail,
+                                  BussinessEmail = !string.IsNullOrWhiteSpace(cst.BussinessEmail) ? cst.BussinessEmail : "", 
+                                  Gstin = !string.IsNullOrWhiteSpace(cst.Gstin) ? cst.Gstin : "", 
+                                  AccountNumber = cst.AccountNumber.ToString(), 
+                                  Website = !string.IsNullOrWhiteSpace(cst.Website) ? cst.Website : ""
                               }).FirstOrDefaultAsync();
             }
             return null;
@@ -104,6 +122,12 @@ namespace InvoicesAppAPI.Repositories
             {
                 //Return Lists 
                 var source = (from i in db.Invoices
+                              join c in db.Currencies
+                              on i.CurrencyId equals c.CurrencyId into cGroup
+                              from c in cGroup.DefaultIfEmpty()
+                              join cst in db.Customers
+                              on i.CustomerId equals cst.CustomerId into cstGroup
+                              from cst in cstGroup.DefaultIfEmpty()
                               where i.UserId == UserId && (i.IsDeleted == false || i.IsDeleted == null)
                               orderby i.InvoiceId descending
                               select new InvoiceListViewModel
@@ -123,16 +147,28 @@ namespace InvoicesAppAPI.Repositories
                                   Total = i.Total,
                                   IsSent = i.IsSent,
                                   UserId = i.UserId,
-                                  Notes = i.Notes,
-                                  TermsAndConditions = i.TermsAndConditions,
+                                  Notes = !string.IsNullOrWhiteSpace(i.Notes) ? i.Notes : "",
+                                  TermsAndConditions = !string.IsNullOrWhiteSpace(i.TermsAndConditions) ? i.TermsAndConditions : "",
                                   ConvertedDate = (i.ConvertedDate != null) ? i.ConvertedDate.Value.ToString("dd/MM/yyyy") : "",
                                   IsPaid = i.IsPaid,
                                   PaymentDate = (i.PaymentDate != null) ? i.PaymentDate.Value.ToString("dd/MM/yyyy") : "",
                                   PaymentMode = (i.PaymentMode != null) ? i.PaymentMode : "",
-                                  CurrencyId = i.CurrencyId,
-                                  //CurrencyDetails = { },
+                                  CurrencyId = i.CurrencyId, 
+                                  CurrencyName = c.Name,
+                                  CurrencyCode = c.Code,
+                                  CurrencySymbol = c.Symbol,
                                   CustomerId = i.CustomerId,
-                                  //CustomerDetails = { }
+                                  FirstName = cst.FirstName,
+                                  LastName = cst.LastName,
+                                  BussinessName = cst.BussinessName,
+                                  Phone = cst.Phone,
+                                  Mobile = cst.Mobile,
+                                  Address1 = cst.Address1,
+                                  PersonalEmail = cst.PersonalEmail,
+                                  BussinessEmail = !string.IsNullOrWhiteSpace(cst.BussinessEmail) ? cst.BussinessEmail : "",
+                                  Gstin = !string.IsNullOrWhiteSpace(cst.Gstin) ? cst.Gstin : "",
+                                  AccountNumber = cst.AccountNumber.ToString(),
+                                  Website = !string.IsNullOrWhiteSpace(cst.Website) ? cst.Website : ""
                               }).AsQueryable();
 
                 //Search Parameter With null checks   
@@ -145,6 +181,7 @@ namespace InvoicesAppAPI.Repositories
                                                 x.InvoiceNumber.ToString().Contains(search) ||
                                                 x.PosoNumber.ToString().Contains(search) ||
                                                 x.Tax.ToString().Contains(search) ||
+                                                x.Type.ToString().Contains(search) ||
                                                 x.Status.ToString().Contains(search)
                                                 );
                 }

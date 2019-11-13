@@ -163,7 +163,7 @@ namespace InvoicesAppAPI.Controllers
 
         #region " Get Invoice By Invoice Id"
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "admin, subadmin")]
         [Route("GetInvoice")]
         public async Task<IActionResult> GetInvoiceById(CommonNumericIdViewModel model)
         {
