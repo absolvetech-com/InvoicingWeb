@@ -1,24 +1,39 @@
 import { Injectable } from '@angular/core';
-import { SessionService } from '../helpers/session.service';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class AuthService {
-  currentUserValue: any;
-
-  constructor(private sessionService: SessionService) { }
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { User } from '../models/users';
+import { environment } from 'src/environments/environment';
+import { ApiEndPoint } from '../enum/api-end-point.enum';
 
 
+@Injectable({ providedIn: 'root' })
+export class AuthenticationService {
+  private currentUserSubject: BehaviorSubject<User>;
+  public currentUser: Observable<User>;
 
-  public isLoggedIn() {
-    debugger;
-    this.sessionService.getToken();
-    return localStorage.getItem('ACCESS_TOKEN')!! === null;
+  constructor(private http: HttpClient) {
+    this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('currentUser')));
+    this.currentUser = this.currentUserSubject.asObservable();
   }
 
-  public logout() {
-    localStorage.removeItem('ACCESS_TOKEN');
+  public get currentUserValue(): User {
+    return this.currentUserSubject.value;
   }
 
+  login(username: string, password: string) {
+    return this.http.post<any>('${environment.apiUrl} + ApiEndPoint.login', { username, password })
+      .pipe(map(user => {
+        // store user details and jwt token in local storage to keep user logged in between page refreshes
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        this.currentUserSubject.next(user);
+        return user;
+      }));
+  }
+
+  logout() {
+    // remove user from local storage to log user out
+    localStorage.removeItem('currentUser');
+    this.currentUserSubject.next(null);
+  }
 }

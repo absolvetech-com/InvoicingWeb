@@ -21,6 +21,7 @@ import { RequestInterceptorService } from './core/helpers/http-interceptor';
 import { SessionService } from './core/helpers/session.service';
 import { NgxSpinnerModule } from "ngx-spinner";
 import { SettingComponent } from './content/pages/components/setting/setting.component';
+import { OnlyNumber } from './core/directives/onlyNumber.directive';
 @NgModule({
   declarations: [
     AppComponent,
@@ -34,7 +35,8 @@ import { SettingComponent } from './content/pages/components/setting/setting.com
     ExpensesComponent,
     RegisterComponent,
     OtpComponent,
-    SettingComponent
+    SettingComponent,
+    OnlyNumber
   ],
   imports: [
     BrowserModule,
