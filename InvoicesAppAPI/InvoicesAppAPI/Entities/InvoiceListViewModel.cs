@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InvoicesAppAPI.Entities.Mobile;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace InvoicesAppAPI.Entities
         public string PosoNumber { get; set; } 
         public string Date { get; set; } 
         public string DueDate { get; set; }
-        public List<ItemViewModel> ItemList { get; set; }
+        public List<InvoiceItemsViewModel> ItemList { get; set; }
         //public string ItemList { get; set; }
         public string Status { get; set; }  
         public string Type { get; set; }

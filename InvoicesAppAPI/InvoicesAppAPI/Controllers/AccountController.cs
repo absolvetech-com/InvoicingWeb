@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MimeKit;
 
 namespace InvoicesAppAPI.Controllers
 {
@@ -247,6 +248,27 @@ namespace InvoicesAppAPI.Controllers
                     var userstatus = user.UserStatus;
                     if (result)
                     {
+                        var webRoot = _hostingEnvironment.WebRootPath;  
+                        //Get TemplateFile located at wwwroot/Templates/EmailTemplates/Confirm_Account_Registration_Success.html  
+                        var pathToFile = _hostingEnvironment.WebRootPath
+                                + Path.DirectorySeparatorChar.ToString()
+                                + Constants.mainTemplatesContainer
+                                + Path.DirectorySeparatorChar.ToString()
+                                + Constants.emailTemplatesContainer
+                                + Path.DirectorySeparatorChar.ToString()
+                                + Constants.email_template_Confirm_Account_Registration_Success;
+
+                        var subject = Constants.subject_Confirm_Account_Registration_Success;
+                        var name = user.Name;
+                        var body = new BodyBuilder();  
+                        using (StreamReader reader = System.IO.File.OpenText(pathToFile))
+                        { 
+                            body.HtmlBody = reader.ReadToEnd();
+                        } 
+                        string messageBody = body.HtmlBody;
+                        messageBody = messageBody.Replace("{name}", name);
+                        messageBody = messageBody.Replace("{subject}", subject);
+                        await _emailSender.SendEmailAsync(email: user.Email, subject: subject, htmlMessage: messageBody);  
                         return Ok(new { status = StatusCodes.Status200OK, success = true, message = "email confirmed successfully.", userstatus });
                     }
                     else
@@ -278,10 +300,10 @@ namespace InvoicesAppAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var user = await _userManager.FindByNameAsync(model.Email);
-                    var userstatus = user.UserStatus;
-                    if (user != null && userstatus)
+                    var user = await _userManager.FindByNameAsync(model.Email); 
+                    if (user != null)
                     {
+                        var userstatus = user.UserStatus;
                         // If user has to activate his email to confirm his account, the use code listing below 
                         if (!_userManager.IsEmailConfirmedAsync(user).Result)
                         {
@@ -415,18 +437,18 @@ namespace InvoicesAppAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var user = await _userManager.FindByNameAsync(model.Email);
-                    var userstatus = user.UserStatus;
-                    if (!userstatus)
+                    var user = await _userManager.FindByNameAsync(model.Email); 
+                    if (user != null)
                     {
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "user blocked or deleted. please contact to administrator", userstatus = false });
-                    }
-                    if (user.EmailConfirmed)
-                    {
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "email already confirmed", userstatus });
-                    }
-                    if (user != null && userstatus)
-                    {  
+                        var userstatus = user.UserStatus;
+                        if (!userstatus)
+                        {
+                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "user blocked or deleted. please contact to administrator", userstatus = false });
+                        }
+                        if (user.EmailConfirmed)
+                        {
+                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "email already confirmed", userstatus });
+                        }
                         user.ConfirmationCode = CommonMethods.GenerateOTP().ToString();
                         IdentityResult res = await _userManager.UpdateAsync(user);
                         if (res.Succeeded)

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using InvoicesAppAPI.Entities;
 using InvoicesAppAPI.Entities.Mobile;
@@ -9,9 +11,11 @@ using InvoicesAppAPI.Helpers;
 using InvoicesAppAPI.Models;
 using InvoicesAppAPI.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 using Newtonsoft.Json;
 
 namespace InvoicesAppAPI.Controllers
@@ -24,11 +28,18 @@ namespace InvoicesAppAPI.Controllers
 
         private UserManager<ApplicationUser> _userManager;
         private IInvoiceService _invoiceService;
+        private IBussinessService _bussinessService;
+        private readonly IEmailManager _emailSender;
+        private IWebHostEnvironment _hostingEnvironment;
 
-        public InvoiceController(UserManager<ApplicationUser> userManager, IInvoiceService invoiceService)
+        public InvoiceController(UserManager<ApplicationUser> userManager, IInvoiceService invoiceService, IBussinessService service,
+            IEmailManager emailSender, IWebHostEnvironment hostingEnvironment)
         {
             _userManager = userManager;
             _invoiceService = invoiceService;
+            _bussinessService = service;
+            _emailSender = emailSender;
+            _hostingEnvironment = hostingEnvironment;
         }
         #endregion
 
@@ -70,7 +81,7 @@ namespace InvoicesAppAPI.Controllers
                     bool isSent = false; 
                     if(model.Status.ToUpper() == Constants.statusSent)
                     {
-                        model.Status = Constants.statusSent;
+                        model.Status = Constants.statusUnpaidOrPending;
                         isSent = true;
                     }
                     else if (model.Status.ToUpper() == Constants.statusDrafted)
@@ -109,6 +120,10 @@ namespace InvoicesAppAPI.Controllers
                     var retId = await _invoiceService.AddInvoice(invoices);
                     if (retId > 0)
                     {
+                        if (invoices.IsSent)
+                        {
+                            await _invoiceService.SendInvoiceMail(retId);
+                        }
                         return Ok(new { status = StatusCodes.Status200OK, success = true, message = "invoice created successfully.", userstatus });
                     }
                     else
@@ -225,5 +240,45 @@ namespace InvoicesAppAPI.Controllers
         }
 
         #endregion
+
+
+        #region " Delete Invoice"
+        [HttpPost]
+        [Authorize(Roles = "admin, subadmin")]
+        [Route("DeleteInvoice")]
+        public async Task<IActionResult> DeleteInvoice(CommonNumericIdViewModel model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    //to get userid from access token
+                    string Id = User.Claims.First(c => c.Type == "UserID").Value;
+                    var user = await _userManager.FindByIdAsync(Id);
+                    var userstatus = user.UserStatus; 
+                    var invoice = await _invoiceService.GetInvoiceByInvoiceId(model._Id);
+                    if (invoice == null)
+                    {
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any invoice.", userstatus = false });
+                    }
+                    invoice.UserId = Id;
+                    bool res = await _invoiceService.DeleteInvoice(invoice);
+                    if (res)
+                    {
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "invoice deleted successfully.", userstatus });
+                    }
+                    else
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "db connection error", userstatus = false });
+                }
+                else
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct", userstatus = false });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+            }
+        }
+        #endregion
+
     }
 }
