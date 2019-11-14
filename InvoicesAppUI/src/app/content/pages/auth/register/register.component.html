@@ -56,7 +56,11 @@
               <div *ngIf="registerForm.get('password').touched && registerForm.get('password').invalid"
                 class="invalid-feedback">
                 <div *ngIf="registerForm.get('password').errors.required">Password is required</div>
-                <div *ngIf="registerForm.get('password').errors.minlength">Password must be a letaset 6 charector</div>
+                <div *ngIf="registerForm.get('password').errors.minlength">Password must be a letaset 8 digit</div>
+                <div *ngIf="registerForm.get('password').hasError('pattern')">
+                  Pattern Not valid (Atleast 1
+                  Character,1 number)
+                </div>
               </div>
               <span class="focus-bg"></span>
             </div>

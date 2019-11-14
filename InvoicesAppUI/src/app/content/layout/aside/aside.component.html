@@ -1,65 +1,198 @@
- <div class="sidebar panel" id="">
-   <ul>
-     <li class="user-profile">
-       <img src="assets/images/user.png">
-       <div class="user-detail">
-         <h4>Parmjot singh</h4>
-         <p>abc@gmail.com</p>
-       </div>
-     </li>
-     <li>
-       <a [routerLink]="['/dashboard']" routerLinkActive="router-link-active">
-         <span>Dashboard</span>
-         <i class="i fas fa-tachometer-alt"></i>
-       </a>
-     </li>
-     <!-- <li>
+<div class="sidebar panel" id="">
+  <ul>
+    <li class="user-profile">
+      <img src="assets/images/user.png">
+      <div class="user-detail">
+        <h4>Parmjot singh</h4>
+        <p>abc@gmail.com</p>
+      </div>
+    </li>
+    <li>
+      <a [routerLink]="['/dashboard']" routerLinkActive="router-link-active">
+        <span>Dashboard</span>
+        <i class="i fas fa-tachometer-alt"></i>
+      </a>
+    </li>
+    <!-- <li>
        <a [routerLink]="['/invoice']" routerLinkActive="router-link-active">
          <span>Invoices Management</span>
          <img class="i" src="assets/images/incoming.png">
        </a>
      </li> -->
-     <li>
-       <a [routerLink]="['/vendor-management']" routerLinkActive="router-link-active">
-         <span>Vendor Management</span>
-         <img class="i" src="assets/images/vender.png">
-       </a>
-     </li>
-     <li>
-       <a [routerLink]="['/expenses']" routerLinkActive="router-link-active">
-         <span>Expenses</span>
-         <img src="assets/images/expense.png" class="i">
-       </a>
-     </li>
-     <li>
-       <a [routerLink]="['/routePath']" routerLinkActive="router-link-active">
-         <span>Dept Collection</span>
-         <img src=" assets/images/dept.png" class="i">
-       </a>
-     </li>
-     <li>
-       <a [routerLink]="['/routePath']" routerLinkActive="router-link-active">
-         <span>Items</span>
-         <img src="assets/images/item.png" class="i">
-       </a>
-     </li>
-     <li>
-       <a [routerLink]="['/routePath']" routerLinkActive="router-link-active">
-         <span>Statement</span>
-         <img src="assets/images/statement.png" class="i">
-       </a>
-     </li>
-     <li>
-       <a [routerLink]="['/setting']" routerLinkActive="router-link-active">
-         <span>Settings</span>
-         <img src="assets/images/setting.png" class="i">
-       </a>
-     </li>
-     <li class="management-btn">
-       <a [routerLink]="['/routePath']" routerLinkActive="router-link-active">
-         <span>Membership</span>
-         <img src=" assets/images/dept.png" class="i">
-       </a>
-     </li>
-   </ul>
- </div>
+    <li>
+      <a [routerLink]="['/vendor-management']" routerLinkActive="router-link-active">
+        <span>Vendor Management</span>
+        <img class="i" src="assets/images/vender.png">
+      </a>
+    </li>
+    <li>
+      <a [routerLink]="['/expenses']" routerLinkActive="router-link-active">
+        <span>Expenses</span>
+        <img src="assets/images/expense.png" class="i">
+      </a>
+    </li>
+    <li>
+      <a [routerLink]="['/routePath']" routerLinkActive="router-link-active">
+        <span>Dept Collection</span>
+        <img src=" assets/images/dept.png" class="i">
+      </a>
+    </li>
+    <li>
+      <a [routerLink]="['/routePath']" routerLinkActive="router-link-active">
+        <span>Items</span>
+        <img src="assets/images/item.png" class="i">
+      </a>
+    </li>
+    <li>
+      <a [routerLink]="['/routePath']" routerLinkActive="router-link-active">
+        <span>Statement</span>
+        <img src="assets/images/statement.png" class="i">
+      </a>
+    </li>
+    <div class="accordion" id="accordionExample">
+      <li id="headingOne">
+        <a class="active" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true"
+          aria-controls="collapseOne">
+          <span>Settings</span>
+          <div class="icon-arrow">
+            <img src="assets/images/setting.png" class="i">
+            <i class="fa fa-caret-down" aria-hidden="true"></i>
+          </div>
+        </a>
+      </li>
+      <div id="collapseOne" class="collapse accordion-collapse-menu" aria-labelledby="headingOne"
+        data-parent="#accordionExample">
+        <ul class="accordion" id="accordionExample-inner">
+          <li id="headingOne-inner">
+            <a data-toggle="collapse" data-target="#collapseOne-inner" aria-expanded="true" aria-controls="collapseOne">
+              <span>Account</span>
+              <i class="fa fa-caret-down" aria-hidden="true"></i>
+            </a>
+          </li>
+          <div id="collapseOne-inner" class="collapse" aria-labelledby="headingOne-inner"
+            data-parent="#accordionExample-inner">
+            <ul class="collapse-inner-2">
+              <li>
+                <a [routerLink]="['/linked-user']" routerLinkActive="router-link-active">
+                  <span>Linked user</span>
+                </a>
+              </li>
+              <li>
+                <a [routerLink]="['/routePath']" routerLinkActive="router-link-active">
+                  <span>Currency</span>
+                </a>
+              </li>
+              <li>
+                <a [routerLink]="['/setting/edit-profile']" routerLinkActive="router-link-active">
+                  <span>Edit Profile</span>
+                </a>
+              </li>
+              <li>
+                <a [routerLink]="['/change-password']" routerLinkActive="router-link-active">
+                  <span>Change Password</span>
+                </a>
+              </li>
+              <li>
+                <a [routerLink]="['/routePath']" routerLinkActive="router-link-active">
+                  <span>Logs</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </ul>
+
+        <ul class="accordion" id="accordionExample-Invoice">
+          <li id="headingOne-Invoice">
+            <a data-toggle="collapse" data-target="#collapseOne-Invoice" aria-expanded="false"
+              aria-controls="collapseOne">
+              <span>Invoice</span>
+              <i class="fa fa-caret-down" aria-hidden="true"></i>
+            </a>
+          </li>
+          <div id="collapseOne-Invoice" class="collapse" aria-labelledby="headingOne-Invoice"
+            data-parent="#accordionExample-Invoice">
+            <ul class="collapse-Invoice-2">
+              <li>
+                <a [routerLink]="['/linked-user']" routerLinkActive="router-link-active">
+                  <span>Customer Invoice</span>
+                </a>
+              </li>
+              <li>
+                <a [routerLink]="['/routePath']" routerLinkActive="router-link-active">
+                  <span>Invoice Default</span>
+                </a>
+              </li>
+              <li>
+                <a [routerLink]="['/setting/edit-profile']" routerLinkActive="router-link-active">
+                  <span>Tax</span>
+                </a>
+              </li>
+              <li>
+                <a [routerLink]="['/change-password']" routerLinkActive="router-link-active">
+                  <span>Items</span>
+                </a>
+              </li>
+              <li>
+                <a [routerLink]="['/routePath']" routerLinkActive="router-link-active">
+                  <span>Statement</span>
+                </a>
+              </li>
+              <li>
+                <a [routerLink]="['/routePath']" routerLinkActive="router-link-active">
+                  <span>Signature</span>
+                </a>
+              </li>
+              <li>
+                <a [routerLink]="['/routePath']" routerLinkActive="router-link-active">
+                  <span>Membership</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </ul>
+
+        <ul class="accordion" id="accordionExample-Other">
+          <li id="headingOne-Other">
+            <a data-toggle="collapse" data-target="#collapseOne-Other" aria-expanded="false"
+              aria-controls="collapseOne">
+              <span>Other</span>
+              <i class="fa fa-caret-down" aria-hidden="true"></i>
+            </a>
+          </li>
+          <div id="collapseOne-Other" class="collapse" aria-labelledby="headingOne-Other"
+            data-parent="#accordionExample-Other">
+            <ul class="collapse-Other-2">
+              <li>
+                <a [routerLink]="['/linked-user']" routerLinkActive="router-link-active">
+                  <span>Invite People</span>
+                </a>
+              </li>
+              <li>
+                <a [routerLink]="['/routePath']" routerLinkActive="router-link-active">
+                  <span>Contact Us</span>
+                </a>
+              </li>
+              <li>
+                <a [routerLink]="['/setting/edit-profile']" routerLinkActive="router-link-active">
+                  <span>Sign Out</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </ul>
+      </div>
+    </div>
+    <li class="management-btn">
+      <a [routerLink]="['/routePath']" routerLinkActive="router-link-active">
+        <span>Membership</span>
+        <img src=" assets/images/dept.png" class="i">
+      </a>
+    </li>
+  </ul>
+</div>
+<script>
+  $(".flip").click(function (e) {
+    $(".panel , .body-content").toggleClass('open');
+  });
+
+</script>
