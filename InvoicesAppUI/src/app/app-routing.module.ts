@@ -8,39 +8,27 @@ import { ExpensesComponent } from './content/pages/components/expenses/expenses.
 import { RegisterComponent } from './content/pages/auth/register/register.component';
 import { OtpComponent } from './content/pages/auth/otp/otp.component';
 import { AuthGuard } from './core/helpers/auth.guard';
-import { SettingComponent } from './content/pages/components/setting/setting.component';
+import { PageNotFoundComponent } from './content/pages/auth/page-not-found/page-not-found.component';
+import { ResetPasswordComponent } from './content/pages/auth/reset-password/reset-password.component';
 const routes: Routes = [
-
-  {
-    path: '',
-    redirectTo: 'login',
-    pathMatch: 'full'
-  },
-  {
-    path: 'dashboard',
-    component: DashboardComponent,
-    canActivate: [AuthGuard]
-
-  },
-  {
-    path: 'login',
-    component: LoginComponent,
-  },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   {
     path: 'vendor-management',
-    component: VendorManagementComponent
+    component: VendorManagementComponent, canActivate: [AuthGuard]
   },
   {
     path: 'expenses',
-    component: ExpensesComponent
-  },
-  {
-    path: 'setting',
-    component: SettingComponent
+    component: ExpensesComponent, canActivate: [AuthGuard]
   },
   {
     path: 'forgot-password',
     component: ForgotPasswordComponent
+  },
+  {
+    path: 'reset-password',
+    component: ResetPasswordComponent
   },
   {
     path: 'register',
@@ -48,12 +36,12 @@ const routes: Routes = [
   },
   {
     path: 'otp',
-    component: OtpComponent
+    component: OtpComponent,
   },
+
   {
     path: '**',
-    redirectTo: '404',
-    pathMatch: 'full'
+    component: PageNotFoundComponent
   }
 ];
 
