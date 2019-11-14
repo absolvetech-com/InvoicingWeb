@@ -53,7 +53,6 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   onResetPassword() {
-    debugger;
     this.submitted = true;
     console.log(this.ResetPasswordOtpForm.value);
     if (this.ResetPasswordOtpForm.invalid) {
@@ -62,7 +61,6 @@ export class ResetPasswordComponent implements OnInit {
 
     this.spinner.show();
     setTimeout(() => {
-      debugger;
       const email = localStorage.getItem('email')
       this.authenticationService.resetPassword(this.ResetPasswordOtpForm.controls['otp'].value, email, this.ResetPasswordOtpForm.controls['newpassword'].value)
         .pipe(first())
