@@ -25,5 +25,7 @@ namespace InvoicesAppAPI.Entities
         }
 
         public string searchQuery { get; set; }
+
+        public string filterBy { get; set; } = "";
     }
 }

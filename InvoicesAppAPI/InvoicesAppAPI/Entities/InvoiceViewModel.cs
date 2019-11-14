@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InvoicesAppAPI.Entities.Mobile;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace InvoicesAppAPI.Entities
         [Required]
         public string DueDate { get; set; }
         [Required]
-        public ItemViewModel[] ItemList { get; set; }
+        public InvoiceItemsViewModel[] ItemList { get; set; }
         [Required]
         public string Status { get; set; }
         [Required]

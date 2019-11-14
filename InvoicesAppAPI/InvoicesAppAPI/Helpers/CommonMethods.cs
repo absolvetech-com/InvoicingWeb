@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace InvoicesAppAPI.Helpers
@@ -98,6 +99,20 @@ namespace InvoicesAppAPI.Helpers
                 filename = filename.Replace(' ', '0').Replace(':', '1').Replace('/', '0');
             } 
             return filename;
+        }
+
+        public static string SplitLine(string input)
+        {
+            var wordList = input.Split(' ');
+            var sb = new StringBuilder();
+            for (int index = 0; index < wordList.Length; index++)
+            {
+                if (index % 8 == 0 && index > 0)
+                    sb.Append("<br/>" + wordList[index]);
+                else
+                    sb.Append(wordList[index] + ' ');
+            }
+            return sb.ToString();
         }
     }
 }
