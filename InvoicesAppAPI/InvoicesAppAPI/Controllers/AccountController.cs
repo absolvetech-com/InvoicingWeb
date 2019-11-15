@@ -104,20 +104,20 @@ namespace InvoicesAppAPI.Controllers
                                 CreatedDate = DateTime.Now
                             };
                             bool status = await _bussinessService.Create(bussiness); 
-                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user registered succesfully." });
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = ResponseMessages.msgUserRegisterSuccess });
                         }
                         else if (model.Role == Constants.isSuperAdmin && result.Succeeded)
                         { 
-                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user registered succesfully." });
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = ResponseMessages.msgUserRegisterSuccess });
                         }
                         else if (model.Role == Constants.isSubAdmin && result.Succeeded)
                         { 
                             //5 sub admin check later
-                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user registered succesfully." });
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = ResponseMessages.msgUserRegisterSuccess });
                         }
                         else
                         {
-                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "something went wrong." });
+                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgSomethingWentWrong });
                         } 
                     }
                     else
@@ -132,7 +132,7 @@ namespace InvoicesAppAPI.Controllers
             }
             else
             {  
-                return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "requested user type is not authorised" });
+                return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgUserRoleNotAuthorized });
             } 
         }
 
@@ -148,25 +148,25 @@ namespace InvoicesAppAPI.Controllers
             { 
                 if (!ModelState.IsValid)
                 { 
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success= false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success= false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
                 }
 
                 var user = await _userManager.FindByEmailAsync(model.Email);
                 if (user == null)
                 {
-                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found any user associated with this email.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus = false });
                 }
                 var userstatus = user.UserStatus;
                 if (!userstatus)
                 {
-                    return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "user blocked or deleted. please contact to administrator", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgUserBlockedOrDeleted, userstatus = false });
                 }
                 if (user != null && userstatus && await _userManager.CheckPasswordAsync(user, model.Password))
                 {
                     //check email is confirmed
                     if (!_userManager.IsEmailConfirmedAsync(user).Result)
                     { 
-                        return Ok(new { status = StatusCodes.Status200OK, success = false, message = "email not confirmed.", userstatus });
+                        return Ok(new { status = StatusCodes.Status200OK, success = false, message = ResponseMessages.msgEmailNotConfirmed, userstatus });
                     }
                     // update user with device type and device token
                     user.DeviceToken = model.DeviceToken;
@@ -220,14 +220,14 @@ namespace InvoicesAppAPI.Controllers
                     {
                         user_info = _userinfo;
                     };
-                    return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user successfully login.", userstatus, user_info });
+                    return Ok(new { status = StatusCodes.Status200OK, success = true, message = ResponseMessages.msgUserLoginSuccess, userstatus, user_info });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "username or password is incorrect.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgInvalidCredentials, userstatus = false });
             }
             catch(Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong."+ ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
 
@@ -269,21 +269,21 @@ namespace InvoicesAppAPI.Controllers
                         messageBody = messageBody.Replace("{name}", name);
                         messageBody = messageBody.Replace("{subject}", subject);
                         await _emailSender.SendEmailAsync(email: user.Email, subject: subject, htmlMessage: messageBody);  
-                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "email confirmed successfully.", userstatus });
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = ResponseMessages.msgEmailConfirmationSuccess, userstatus });
                     }
                     else
                     {
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "otp is invalid.", userstatus });
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgInvalidOTP, userstatus });
                     }
                 }
                 else
                 { 
-                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found any user associated with this email.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus = false });
                 }
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
 
@@ -307,7 +307,7 @@ namespace InvoicesAppAPI.Controllers
                         // If user has to activate his email to confirm his account, the use code listing below 
                         if (!_userManager.IsEmailConfirmedAsync(user).Result)
                         {
-                            return Ok(new { status = StatusCodes.Status200OK, success = false, message = "email not confirmed.", userstatus });
+                            return Ok(new { status = StatusCodes.Status200OK, success = false, message = ResponseMessages.msgEmailNotConfirmed, userstatus });
                         }
                          
                         int code = CommonMethods.GenerateOTP();
@@ -318,20 +318,20 @@ namespace InvoicesAppAPI.Controllers
                             //sent email here with code using await  
                             var msg = $"Hi {user.Name}, <br/><br/> Your one time password is {code} for reseting password on invoicing. <br/><br/> Thanks";
                             await _emailSender.SendEmailAsync(email: user.Email, subject: "Reset Password", htmlMessage: msg); 
-                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "OTP sent on your email.", userstatus });
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = ResponseMessages.msgOTPSentSuccess, userstatus });
                         }
                         else
                             return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus=false });
                     }
                     else 
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't found any user associated with this email.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus = false });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
 
@@ -355,7 +355,7 @@ namespace InvoicesAppAPI.Controllers
                         // If user has to activate his email to confirm his account, the use code listing below 
                         if (!_userManager.IsEmailConfirmedAsync(user).Result)
                         {
-                            return Ok(new { status = StatusCodes.Status200OK, success = false, message = "email not confirmed.", userstatus });
+                            return Ok(new { status = StatusCodes.Status200OK, success = false, message = ResponseMessages.msgEmailNotConfirmed, userstatus });
                         }
 
                         var newPassword = model.Password;
@@ -364,22 +364,22 @@ namespace InvoicesAppAPI.Controllers
                         bool result = _userService.ResetPassword(model).Result;
                         if (result)
                         {
-                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "password reset successfully.", userstatus });
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = ResponseMessages.msgPasswordResetSuccess, userstatus });
                         }
                         else
                         {
-                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "otp code is invalid.", userstatus = false }); ;
+                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgInvalidOTP, userstatus = false }); ;
                         } 
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't any user associated with this email.", userstatus });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
 
@@ -405,7 +405,7 @@ namespace InvoicesAppAPI.Controllers
                         IdentityResult result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
                         if (result.Succeeded)
                         {
-                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "password changed successfully.", userstatus });
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = ResponseMessages.msgPasswordChangeSuccess, userstatus });
                         }
                         else
                         {
@@ -413,14 +413,14 @@ namespace InvoicesAppAPI.Controllers
                         }
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't any user associated with this email.", userstatus });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
 
@@ -443,11 +443,11 @@ namespace InvoicesAppAPI.Controllers
                         var userstatus = user.UserStatus;
                         if (!userstatus)
                         {
-                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "user blocked or deleted. please contact to administrator", userstatus = false });
+                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgUserBlockedOrDeleted, userstatus = false });
                         }
                         if (user.EmailConfirmed)
                         {
-                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "email already confirmed", userstatus });
+                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgEmailAlreadyConfirmed, userstatus });
                         }
                         user.ConfirmationCode = CommonMethods.GenerateOTP().ToString();
                         IdentityResult res = await _userManager.UpdateAsync(user);
@@ -456,20 +456,20 @@ namespace InvoicesAppAPI.Controllers
                             //sent email here with code using await   
                             var msg = $"Hi {user.Name}, <br/><br/> Your confirmation code to access your account is {user.ConfirmationCode}. <br/><br/>Thanks";
                             await _emailSender.SendEmailAsync(email: user.Email, subject: "Confirmation Email", htmlMessage: msg);
-                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "confirmation code sent on your email.", userstatus });
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = ResponseMessages.msgConfirmationCodeSentSuccess, userstatus });
                         }
                         else
                             return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus = false });
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't found any user associated with this email.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus = false });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
 
@@ -486,7 +486,7 @@ namespace InvoicesAppAPI.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
                 } 
                 var newUser = await _userManager.FindByNameAsync(model.NewEmail) ?? await _userManager.FindByEmailAsync(model.NewEmail); 
                 if (newUser == null)
@@ -500,7 +500,7 @@ namespace InvoicesAppAPI.Controllers
                         // If user has to activate his email to confirm his account, the use code listing below 
                         if (!_userManager.IsEmailConfirmedAsync(user).Result)
                         {
-                            return Ok(new { status = StatusCodes.Status200OK, success = false, message = "email not confirmed.", userstatus });
+                            return Ok(new { status = StatusCodes.Status200OK, success = false, message = ResponseMessages.msgEmailNotConfirmed, userstatus });
                         } 
                         user.Otp = CommonMethods.GenerateOTP();
                         user.Newemail = model.NewEmail;
@@ -514,20 +514,20 @@ namespace InvoicesAppAPI.Controllers
                             //sent email on new email here with code using await  
                             var newmsg = $"Hi {user.Name}, <br/><br/> Your confirmation code to access your account is {user.EmailOtp} on invoicing. <br/><br/> Thanks";
                             await _emailSender.SendEmailAsync(email: user.Newemail, subject: "Reset Email", htmlMessage: newmsg);
-                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "Reset email OTP sent on your both emails.", userstatus });
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = ResponseMessages.msgResetEmailOtpSendSuccess, userstatus });
                         }
                         else
                             return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus = false });
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't found any user associated with this email.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus = false });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "the email provided already in used. please try with other email", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgEmailAlreadyUsed, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
 
@@ -553,7 +553,7 @@ namespace InvoicesAppAPI.Controllers
                         // If user has to activate his email to confirm his account, the use code listing below 
                         if (!_userManager.IsEmailConfirmedAsync(user).Result)
                         {
-                            return Ok(new { status = StatusCodes.Status200OK, success = false, message = "email not confirmed.", userstatus });
+                            return Ok(new { status = StatusCodes.Status200OK, success = false, message = ResponseMessages.msgEmailNotConfirmed, userstatus });
                         }
                          
                         if (user.Otp == Convert.ToInt32(model.OldEmailOTP) && user.EmailOtp == Convert.ToInt32(model.NewEmailOTP))
@@ -571,21 +571,21 @@ namespace InvoicesAppAPI.Controllers
                             IdentityResult res = await _userManager.UpdateAsync(user);
                             if (res.Succeeded)
                             {
-                                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "email reset successfully. please login with new email.", userstatus });
+                                return Ok(new { status = StatusCodes.Status200OK, success = true, message = ResponseMessages.msgEmailResetSuccess, userstatus });
                             }
                             else
                                 return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus = false });                            
                         }
                         else
                         {
-                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "either new or old email otp code is invalid.", userstatus = false }); ;
+                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgNewOldOtpInvalid, userstatus = false }); ;
                         }
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't any user associated with this email.", userstatus });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
@@ -608,7 +608,7 @@ namespace InvoicesAppAPI.Controllers
                 var user = await _userManager.FindByIdAsync(userId);
                  
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user logout successfully." });
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = ResponseMessages.msgLogoutSuccess });
             }
             catch (Exception ex)
             {

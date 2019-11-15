@@ -82,13 +82,13 @@ namespace InvoicesAppAPI.Controllers
                     _userDetails.Gender = user.Gender;
                     _userDetails.CreatedDate = user.CreatedDate;
                     _userDetails.BussinessDetails = bussiness;
-                    return new JsonResult(new { status = StatusCodes.Status200OK, success = true, message = "show user profile successfully.", userstatus, user_info = _userDetails });
+                    return new JsonResult(new { status = StatusCodes.Status200OK, success = true, message = "user profile"+ ResponseMessages.msgShownSuccess, userstatus, user_info = _userDetails });
                 }
-                return new JsonResult(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found any user.", userstatus = false });
+                return new JsonResult(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus = false });
             }
             catch (Exception ex)
             {
-                return new JsonResult(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return new JsonResult(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
 
@@ -136,20 +136,20 @@ namespace InvoicesAppAPI.Controllers
                         IdentityResult res = await _userManager.UpdateAsync(user);
                         if (res.Succeeded)
                         { 
-                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user profile updated successfully.", userstatus });
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user profile"+ ResponseMessages.msgUpdationSuccess, userstatus });
                         }
                         else
                             return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus = false });
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't find an account with that email or user is blocked.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgUserBlockedOrDeleted, userstatus = false });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
         #endregion
@@ -175,20 +175,20 @@ namespace InvoicesAppAPI.Controllers
                         bool result = await _bussinessService.UpdateBussinessProfile(_bussinessmodel);
                         if(result)
                         { 
-                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "bussiness profile updated successfully.", userstatus });
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "bussiness profile"+ ResponseMessages.msgUpdationSuccess, userstatus });
                         }
                         else
-                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "some error occurs", userstatus = false }); 
+                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgDbConnectionError, userstatus = false }); 
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, block or inactive user can't update bussiness detials.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgBlockOrInactiveUserNotPermitted, userstatus = false });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
         #endregion
@@ -209,15 +209,15 @@ namespace InvoicesAppAPI.Controllers
                     var linkedusers = await _userService.GetLinkedUsers(Id);
                     if (linkedusers == null)
                     {
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any linked user.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgNotFound+"linked user.", userstatus = false });
                     } 
-                    return Ok(new { status = StatusCodes.Status200OK, success = true, message = "linked users getting successfully.", userstatus = true, linkedusers });
+                    return Ok(new { status = StatusCodes.Status200OK, success = true, message = "linked users"+ ResponseMessages.msgListFoundSuccess, userstatus = true, linkedusers });
                 }
-                return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "invalid access token or your current session has expired. please login again to keep all your service working", userstatus = false });
+                return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgSessionExpired, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
 
@@ -239,7 +239,7 @@ namespace InvoicesAppAPI.Controllers
                     var linkeduser = await _userManager.FindByIdAsync(_model._Id);
                     if(linkeduser == null)
                     {
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any linked user.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus = false });
                     }
                     linkeduser.UserStatus = false;
                     linkeduser.IsDeleted = true;
@@ -248,16 +248,16 @@ namespace InvoicesAppAPI.Controllers
                     IdentityResult res = await _userManager.UpdateAsync(linkeduser);
                     if (res.Succeeded)
                     {
-                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user deleted successfully.", userstatus = true });
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user"+ ResponseMessages.msgDeletionSuccess, userstatus = true });
                     }
                     else
                         return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus = false });
                 }
-                return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct", userstatus = false });
+                return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
         #endregion
@@ -301,13 +301,13 @@ namespace InvoicesAppAPI.Controllers
                     _userDetails.Company_name = (!string.IsNullOrEmpty(bussiness.BussinessName)) ? bussiness.BussinessName : "";
                     _userDetails.Web_address = (!string.IsNullOrEmpty(bussiness.WebAddress)) ? bussiness.WebAddress : "";
                     _userDetails.Fax = (!string.IsNullOrEmpty(bussiness.Fax)) ? bussiness.Fax : "";
-                    return new JsonResult(new { status = StatusCodes.Status200OK, success = true, message = "show user profile successfully.", userstatus, user_info = _userDetails });
+                    return new JsonResult(new { status = StatusCodes.Status200OK, success = true, message = "user profile"+ ResponseMessages.msgShownSuccess, userstatus, user_info = _userDetails });
                 }
-                return new JsonResult(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found any user.", userstatus = false });
+                return new JsonResult(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus = false });
             }
             catch (Exception ex)
             {
-                return new JsonResult(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return new JsonResult(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
 
@@ -349,13 +349,13 @@ namespace InvoicesAppAPI.Controllers
                     _userDetails.StateName = (!string.IsNullOrEmpty(bussiness.StateName)) ? bussiness.StateName : "";
                     _userDetails.City = (!string.IsNullOrEmpty(bussiness.City)) ? bussiness.City : "";
                     _userDetails.Postalcode = (!string.IsNullOrEmpty(bussiness.Postalcode)) ? bussiness.Postalcode : "";
-                    return new JsonResult(new { status = StatusCodes.Status200OK, success = true, message = "show user address successfully.", userstatus, user_info = _userDetails });
+                    return new JsonResult(new { status = StatusCodes.Status200OK, success = true, message = "user address"+ ResponseMessages.msgShownSuccess, userstatus, user_info = _userDetails });
                 }
-                return new JsonResult(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found any user address.", userstatus = false });
+                return new JsonResult(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgNotFound + "user address.", userstatus = false });
             }
             catch (Exception ex)
             {
-                return new JsonResult(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return new JsonResult(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
 
@@ -400,23 +400,23 @@ namespace InvoicesAppAPI.Controllers
                             bool result = await _bussinessService.UpdateBussinessProfile(_bussinessmodel);
                             if (result)
                             {
-                                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "profile updated successfully.", userstatus });
+                                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "profile"+ ResponseMessages.msgUpdationSuccess, userstatus });
                             }
                             else
-                                return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "some error occurs", userstatus = false });                      
+                                return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgDbConnectionError, userstatus = false });                      
                         }
                         else
                             return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus = false });
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't find an account with that email or user is blocked.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus = false });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
         #endregion
@@ -449,20 +449,20 @@ namespace InvoicesAppAPI.Controllers
                         bool result = await _bussinessService.UpdateBussinessProfile(_bussinessmodel);
                         if (result)
                         {
-                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "address updated successfully.", userstatus });
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "address"+ ResponseMessages.msgUpdationSuccess, userstatus });
                         }
                         else
-                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "some error occurs", userstatus = false }); 
+                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgDbConnectionError, userstatus = false }); 
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't find an account with that email or user is blocked.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus = false });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
         #endregion
@@ -490,20 +490,20 @@ namespace InvoicesAppAPI.Controllers
                         bool result = await _bussinessService.UpdateBussinessProfile(_bussinessmodel);
                         if (result)
                         {
-                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "currency updated successfully.", userstatus });
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "currency"+ ResponseMessages.msgUpdationSuccess, userstatus });
                         }
                         else
-                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "some error occurs", userstatus = false });
+                            return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgDbConnectionError, userstatus = false });
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't find an account with that email or user is blocked.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus = false });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong+ ex.Message, userstatus = false });
             }
         }
         #endregion
@@ -539,20 +539,20 @@ namespace InvoicesAppAPI.Controllers
                         IdentityResult res = await _userManager.UpdateAsync(user);
                         if (res.Succeeded)
                         {
-                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user profile pic updated successfully.", userstatus });
+                            return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user profile picture"+ ResponseMessages.msgUpdationSuccess, userstatus });
                         }
                         else
                             return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus = false });
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't find an account with that email or user is blocked.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus = false });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
         #endregion
@@ -578,18 +578,18 @@ namespace InvoicesAppAPI.Controllers
                     IdentityResult res = await _userManager.UpdateAsync(user);
                     if (res.Succeeded)
                     {
-                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user profile pic deleted successfully.", userstatus });
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "user profile picture"+ ResponseMessages.msgDeletionSuccess, userstatus });
                     }
                     else
                         return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = res.Errors.First().Code, userstatus = false });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "sorry, we couldn't find an account with that email or user is blocked.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgCouldNotFoundAssociatedUser, userstatus = false });
 
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
         #endregion

@@ -42,13 +42,13 @@ namespace InvoicesAppAPI.Controllers
                 var currencyList = await _managementService.GetCurrencyList();
                 if (currencyList == null)
                 {
-                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any currency." });
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgNotFound + "currency." });
                 }
-                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "currencies list successfully shown.", currencyList });
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "currency"+ ResponseMessages.msgListFoundSuccess, currencyList });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message });
             }
         }
 
@@ -65,18 +65,18 @@ namespace InvoicesAppAPI.Controllers
             {
                 if (currencyId == null)
                 {
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct." });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect });
                 } 
                 var currency = await _managementService.GetCurrencyById(currencyId); 
                 if (currency == null)
                 {
-                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found currency." });
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgNotFound+"currency." });
                 } 
-                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "currency found successfully.", currency });
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "currency"+ ResponseMessages.msgFoundSuccess, currency });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message });
             }
         }
 
@@ -94,13 +94,13 @@ namespace InvoicesAppAPI.Controllers
                 var countriesList = await _managementService.GetCountryList();
                 if (countriesList == null)
                 {
-                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any country." });
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgNotFound + "country." });
                 }
-                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "country list successfully shown.", countriesList });
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "country"+ ResponseMessages.msgListFoundSuccess, countriesList });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message });
             }
         }
 
@@ -117,18 +117,18 @@ namespace InvoicesAppAPI.Controllers
             {
                 if (countryId == null)
                 {
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct." });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect });
                 }
                 var country = await _managementService.GetCountryById(countryId);
                 if (country == null)
                 {
-                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found country." });
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgNotFound + "country." });
                 }
-                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "country found successfully.", country });
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "country"+ ResponseMessages.msgFoundSuccess, country });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message });
             }
         }
 
@@ -146,13 +146,13 @@ namespace InvoicesAppAPI.Controllers
                 var countriesList = await _managementService.GetCountryStateList();
                 if (countriesList == null)
                 {
-                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any country." });
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgNotFound + "country." });
                 }
-                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "country list successfully shown.", countriesList });
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "country"+ ResponseMessages.msgListFoundSuccess, countriesList });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message });
             }
         }
 
@@ -169,18 +169,18 @@ namespace InvoicesAppAPI.Controllers
             {
                 if (stateId == null)
                 {
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct." });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect });
                 }
                 var state = await _managementService.GetStateById(stateId);
                 if (state == null)
                 {
-                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found state." });
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgNotFound+ "state." });
                 }
-                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "state found successfully.", state });
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "state"+ ResponseMessages.msgFoundSuccess, state });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message });
             }
         }
 
@@ -197,18 +197,18 @@ namespace InvoicesAppAPI.Controllers
             {
                 if (countryId == null)
                 {
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct." });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect });
                 }
                 var states = await _managementService.GetStateByCountry(countryId);
                 if (states == null)
                 {
-                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found states." });
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgNotFound+ "state." });
                 }
-                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "states list found successfully.", states });
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "state"+ ResponseMessages.msgListFoundSuccess, states });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message });
             }
         }
 
@@ -237,23 +237,23 @@ namespace InvoicesAppAPI.Controllers
                     var currencyId = await _managementService.AddCurrency(currencies);
                     if (currencyId > 0)
                     {
-                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "currency created successfully." });
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "currency"+ ResponseMessages.msgCreationSuccess });
                     }
                     else if(currencyId < 0)
                     {
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "currency name already exists." });
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "currency"+ ResponseMessages.msgAlreadyExists });
                     }
                     else
                     {
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "db connection error." });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgDbConnectionError });
                     }
                 }
                 catch (Exception ex)
                 {
-                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message });
                 } 
             }
-            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct." });
+            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect });
         }
         #endregion
 
@@ -281,23 +281,23 @@ namespace InvoicesAppAPI.Controllers
                     var retId = await _managementService.AddCountry(countries);
                     if (retId > 0)
                     {
-                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "country created successfully." });
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "country"+ ResponseMessages.msgCreationSuccess });
                     }
                     else if (retId < 0)
                     {
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "country name already exists." });
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "country"+ ResponseMessages.msgAlreadyExists });
                     }
                     else
                     {
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "db connection error." });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgAlreadyExists });
                     }
                 }
                 catch (Exception ex)
                 {
-                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message });
                 }
             }
-            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct." });
+            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect });
         }
         #endregion
 
@@ -323,23 +323,23 @@ namespace InvoicesAppAPI.Controllers
                     var retId = await _managementService.AddState(states);
                     if (retId > 0)
                     {
-                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "state created successfully." });
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "state"+ ResponseMessages.msgCreationSuccess });
                     }
                     else if (retId < 0)
                     {
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "state name already exists." });
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "state"+ ResponseMessages.msgAlreadyExists });
                     }
                     else
                     {
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "db connection error." });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgDbConnectionError });
                     }
                 }
                 catch (Exception ex)
                 {
-                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message });
                 }
             }
-            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct." });
+            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect });
         }
         #endregion
 
@@ -397,23 +397,23 @@ namespace InvoicesAppAPI.Controllers
                     var retId = await _managementService.AddCustomer(customers);
                     if (retId > 0)
                     {
-                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer created successfully.", userstatus });
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer"+ ResponseMessages.msgCreationSuccess, userstatus });
                     }
                     else if (retId < 0)
                     {
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "customer with same email already exists.", userstatus=false });
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgEmailAlreadyUsed, userstatus=false });
                     }
                     else
                     {
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "db connection error.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgDbConnectionError, userstatus = false });
                     }
                 }
                 catch (Exception ex)
                 {
-                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
                 }
             }
-            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
         }
         #endregion
 
@@ -436,23 +436,23 @@ namespace InvoicesAppAPI.Controllers
                     var retId = await _managementService.UpdateCustomer(model);
                     if (retId > 0)
                     {
-                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer updated successfully.", userstatus });
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer"+ ResponseMessages.msgUpdationSuccess, userstatus });
                     }
                     else if (retId < 0)
                     {
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "customer with same email already exists.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgEmailAlreadyUsed, userstatus = false });
                     }
                     else
                     {
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "db connection error.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgDbConnectionError, userstatus = false });
                     }
                 }
                 catch (Exception ex)
                 {
-                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
                 }
             }
-            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
         }
         #endregion
 
@@ -474,16 +474,16 @@ namespace InvoicesAppAPI.Controllers
                     var customer = await _managementService.GetCustomerById(model._Id);
                     if (customer == null)
                     {
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found customer.", userstatus=false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgNotFound + "customer.", userstatus=false });
                     }
-                    return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer found successfully.", userstatus, customer });
+                    return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer"+ ResponseMessages.msgFoundSuccess, userstatus, customer });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message });
             }
         }
 
@@ -508,23 +508,23 @@ namespace InvoicesAppAPI.Controllers
                     var customer = await _managementService.GetCustomerById(customerId);
                     if (customer == null)
                     {
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any customer.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgNotFound + "customer.", userstatus = false });
                     }
                     customer.UserId = Id;
                     bool res = await _managementService.DeleteCustomer(customer);
                     if (res)
                     {
-                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer deleted successfully.", userstatus });
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer"+ ResponseMessages.msgDeletionSuccess, userstatus });
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "db connection error", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgDbConnectionError, userstatus = false });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
         #endregion
@@ -550,13 +550,13 @@ namespace InvoicesAppAPI.Controllers
                 var customerList = _managementService.GetCustomerList(model, parentUserId);
                 if (customerList == null)
                 {
-                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any customer.", userstatus=false });
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgNotFound+"customer.", userstatus=false });
                 }
-                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer list successfully shown.", userstatus, customerList });
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "customer"+ ResponseMessages.msgListFoundSuccess, userstatus, customerList });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
 
@@ -597,19 +597,19 @@ namespace InvoicesAppAPI.Controllers
                     var retId = await _managementService.AddItem(items);
                     if (retId > 0)
                     {
-                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "item created successfully.", userstatus });
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "item"+ ResponseMessages.msgCreationSuccess, userstatus });
                     } 
                     else
                     {
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "db connection error.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgDbConnectionError, userstatus = false });
                     }
                 }
                 catch (Exception ex)
                 {
-                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
                 }
             }
-            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
         }
         #endregion
 
@@ -632,19 +632,19 @@ namespace InvoicesAppAPI.Controllers
                     var retId = await _managementService.UpdateItem(model);
                     if (retId > 0)
                     {
-                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "item updated successfully.", userstatus });
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "item"+ ResponseMessages.msgUpdationSuccess, userstatus });
                     } 
                     else
                     {
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "db connection error.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgDbConnectionError, userstatus = false });
                     }
                 }
                 catch (Exception ex)
                 {
-                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                    return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
                 }
             }
-            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "parameters are not correct.", userstatus = false });
+            return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
         }
         #endregion
 
@@ -667,23 +667,23 @@ namespace InvoicesAppAPI.Controllers
                     var item = await _managementService.GetItemById(itemId);
                     if (item == null)
                     {
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any item.", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgNotFound+ "item.", userstatus = false });
                     }
                     item.UserId = Id;
                     bool res = await _managementService.DeleteItem(item);
                     if (res)
                     {
-                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "item deleted successfully.", userstatus });
+                        return Ok(new { status = StatusCodes.Status200OK, success = true, message = "item"+ ResponseMessages.msgDeletionSuccess, userstatus });
                     }
                     else
-                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = "db connection error", userstatus = false });
+                        return Ok(new { status = StatusCodes.Status400BadRequest, success = false, message = ResponseMessages.msgDbConnectionError, userstatus = false });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
         #endregion
@@ -706,16 +706,16 @@ namespace InvoicesAppAPI.Controllers
                     var item = await _managementService.GetItemById(model._Id);
                     if (item == null)
                     {
-                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not found any item.", userstatus=false });
+                        return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgNotFound+ "item.", userstatus=false });
                     }
-                    return Ok(new { status = StatusCodes.Status200OK, success = true, message = "item found successfully.", userstatus, item });
+                    return Ok(new { status = StatusCodes.Status200OK, success = true, message = "item"+ ResponseMessages.msgFoundSuccess, userstatus, item });
                 }
                 else
-                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = "passed parameter is not correct", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status406NotAcceptable, success = false, message = ResponseMessages.msgParametersNotCorrect, userstatus = false });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message });
             }
         }
 
@@ -742,13 +742,13 @@ namespace InvoicesAppAPI.Controllers
                 var itemList = _managementService.GetItemList(model, parentUserId);
                 if (itemList == null)
                 {
-                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = "could not find any item.", userstatus = false });
+                    return Ok(new { status = StatusCodes.Status404NotFound, success = false, message = ResponseMessages.msgNotFound+"item.", userstatus = false });
                 }
-                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "item list successfully shown.", userstatus, itemList });
+                return Ok(new { status = StatusCodes.Status200OK, success = true, message = "item"+ ResponseMessages.msgListFoundSuccess, userstatus, itemList });
             }
             catch (Exception ex)
             {
-                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = "something went wrong." + ex.Message, userstatus = false });
+                return Ok(new { status = StatusCodes.Status500InternalServerError, success = false, message = ResponseMessages.msgSomethingWentWrong + ex.Message, userstatus = false });
             }
         }
 
