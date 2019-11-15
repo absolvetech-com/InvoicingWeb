@@ -24,12 +24,10 @@ export class AuthenticationService {
   }
 
   login(user: User) {
-    debugger;
     return this.http.post<any>(environment.apiUrl + '/' + ApiEndPoint.login, user)
       .pipe(map(user => {
 
         if (user.userstatus) {
-          debugger;
           localStorage.setItem('currentUser', JSON.stringify(user.user_info.accessToken));
           this.currentUserSubject.next(user.userstatus);
           this.toaster.success(user.message);
@@ -49,7 +47,6 @@ export class AuthenticationService {
   }
 
   forgotPassword(email: string) {
-    debugger;
     return this.http.post<any>(environment.apiUrl + '/' + ApiEndPoint.forgotPassword, email)
       .pipe(map(user => {
         if (user.userstatus) {
@@ -66,7 +63,6 @@ export class AuthenticationService {
 
 
   resetPassword(code: number, email: string, password: string) {
-    debugger;
     return this.http.post<any>(environment.apiUrl + '/' + ApiEndPoint.resetPassword, { code, email, password })
       .pipe(map(user => {
         console.log('from auth service', user);

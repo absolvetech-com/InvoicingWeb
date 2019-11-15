@@ -42,7 +42,6 @@ export class RegisterComponent implements OnInit {
         .pipe(first())
         .subscribe(
           data => {
-            debugger
             if (data.success == true) {
               this.router.navigateByUrl('/otp'),
                 this.toaster.success(data.message);

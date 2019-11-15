@@ -59,7 +59,6 @@ export class LoginComponent implements OnInit {
         .pipe(first())
         .subscribe(
           data => {
-            debugger;
             if (data == true) {
               this.router.navigateByUrl('/dashboard');
             }

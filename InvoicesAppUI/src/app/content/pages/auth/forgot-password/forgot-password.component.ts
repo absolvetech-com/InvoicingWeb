@@ -26,7 +26,6 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   onClickSendResetLink() {
-    debugger;
     this.submitted = true;
     if (this.forgotPasswordForm.invalid) {
       return;
@@ -38,7 +37,6 @@ export class ForgotPasswordComponent implements OnInit {
         .pipe(first())
         .subscribe(
           data => {
-            debugger;
             if (data == true) {
               localStorage.setItem('email', this.forgotPasswordForm.controls['email'].value)
               this.router.navigateByUrl('/reset-password');

@@ -13,13 +13,4 @@ export class SettingService {
   constructor(private http: HttpClient) { }
 
 
-  // getAllLinkedUsers(): Observable<LinkedUsers[]> {
-  //   debugger;
-  //   return this.http.get<LinkedUsers[]>(environment.apiUrl + '/' + ApiEndPoint.linkedUsers);
-  // }
-
-  getAllLinkedUsers(): Observable<LinkedUsers[]> {
-    debugger;
-    return this.http.get<any>(environment.apiUrl + '/' + ApiEndPoint.linkedUsers);
-  }
 }
